@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } 
 import { useQueryClient } from "@tanstack/react-query";
 import { LayoutDashboard, ShoppingCart, Tags, Wallet, HandCoins, Landmark, Users, FolderKanban, UserCog, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import emblema from "@/assets/emblema.png.asset.json";
+import emblema from "@/assets/emblema-centrado.png.asset.json";
 import { useMe } from "@/lib/use-roles";
 import { ROLE_LABEL } from "@/lib/format";
 import { InstallButton } from "@/components/install-button";
