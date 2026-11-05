@@ -34,7 +34,11 @@ function AuthPage() {
     try {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.message.toLowerCase().includes("invalid login")) throw new Error("E-mail ou senha incorretos. Se ainda não tem conta, clique em \"Primeiro registo da empresa\".");
+          if (error.message.toLowerCase().includes("not confirmed")) throw new Error("Confirme primeiro o seu e-mail através do link que lhe enviámos.");
+          throw error;
+        }
         navigate({ to: "/painel" });
       } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
