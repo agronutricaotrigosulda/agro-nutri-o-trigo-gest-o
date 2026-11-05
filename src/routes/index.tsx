@@ -1,23 +1,30 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import logo from "@/assets/logotipo.png.asset.json";
+import { Button } from "@/components/ui/button";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Agro-Nutrição Trigo — Gestão da Empresa" },
+      { name: "description", content: "Sistema de gestão da Agro-Nutrição Trigo: vendas, finanças em Meticais, RH, governação e projetos." },
+      { property: "og:title", content: "Agro-Nutrição Trigo — Gestão da Empresa" },
+      { property: "og:description", content: "Vendas, finanças, recursos humanos, governação e projetos num só lugar." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 text-center">
+      <img src={logo.url} alt="Agro-Nutrição Trigo" className="w-64 max-w-full sm:w-80" />
+      <div className="max-w-md space-y-2">
+        <h1 className="text-4xl text-primary">Gestão da Empresa</h1>
+        <p className="text-muted-foreground">Vendas, finanças, recursos humanos, governação societária e projetos.</p>
+      </div>
+      <Button asChild size="lg" className="px-10">
+        <Link to="/auth">Entrar</Link>
+      </Button>
+    </main>
   );
 }
