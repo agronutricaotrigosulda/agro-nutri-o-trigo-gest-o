@@ -36,7 +36,7 @@ function Painel() {
   const urgentes = (data?.tasks ?? []).filter((t) => tarefaUrgente(t.due_date, t.done));
   return (
     <>
-      <PageTitle title="Painel" subtitle={`Bem-vindo(a), ${me?.user.user_metadata?.full_name ?? me?.user.email ?? ""}`} />
+      <PageTitle title="Painel" subtitle={`Bem-vindo(a), ${me?.user.user_metadata?.['full_name'] ?? me?.user.email ?? ""}`} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Vendas de hoje" value={<Money value={data?.vendasHoje} />} hint={`${data?.nVendas ?? 0} vendas`} />
         {me?.isGestao && <Stat label="Quem nos deve" value={<Money value={data?.receber} />} />}

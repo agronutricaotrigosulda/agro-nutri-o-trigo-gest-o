@@ -23,7 +23,7 @@ function Produtos() {
   const [n, setN] = useState({ name: "", category: "horticolas", unit: "kg", price_retail: "", price_wholesale: "", max_discount_pct: "0" });
   if (me && !me.isDirecao) return <NoAccess />;
 
-  async function save(id: string, patch: Record<string, any>) {
+  async function save(id: string, patch: any) {
     const { error } = await supabase.from("products").update(patch).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Atualizado"); qc.invalidateQueries(); }
   }

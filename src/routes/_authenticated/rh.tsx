@@ -43,7 +43,7 @@ function RH() {
 
   async function addEmp() {
     if (!n.full_name || !n.doc_number) return toast.error("Nome e documento (BI/DIRE) são obrigatórios");
-    const { error } = await supabase.from("employees").insert({ ...n, base_salary: Number(n.base_salary), hire_date: n.hire_date || undefined });
+    const { error } = await supabase.from("employees").insert({ ...n, hire_date: undefined as never, base_salary: Number(n.base_salary), ...(n.hire_date ? { hire_date: n.hire_date } : {}) });
     if (error) return toast.error(error.message);
     setN({ ...n, full_name: "", email: "", doc_number: "", position: "", base_salary: "" }); refresh();
   }
