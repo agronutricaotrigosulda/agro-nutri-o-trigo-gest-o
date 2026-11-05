@@ -15,6 +15,13 @@
       "when": 1793853789397,
       "tag": "0001_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793874942062,
+      "tag": "0002_tighten_tasks_and_proofs",
+      "breakpoints": true
     }
   ]
 }
