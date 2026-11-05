@@ -15,8 +15,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDividasRouteImport } from './routes/_authenticated/dividas'
 import { Route as AuthenticatedFinancasRouteImport } from './routes/_authenticated/financas'
+import { Route as AuthenticatedGovernacaoRouteImport } from './routes/_authenticated/governacao'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
+import { Route as AuthenticatedRhRouteImport } from './routes/_authenticated/rh'
+import { Route as AuthenticatedUtilizadoresRouteImport } from './routes/_authenticated/utilizadores'
 import { Route as AuthenticatedVendasRouteImport } from './routes/_authenticated/vendas'
 
 const IndexRoute = IndexRouteImport.update({
@@ -48,6 +52,11 @@ const AuthenticatedFinancasRoute = AuthenticatedFinancasRouteImport.update({
   path: '/financas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGovernacaoRoute = AuthenticatedGovernacaoRouteImport.update({
+  id: '/governacao',
+  path: '/governacao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -58,6 +67,22 @@ const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProjetosRoute = AuthenticatedProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhRoute = AuthenticatedRhRouteImport.update({
+  id: '/rh',
+  path: '/rh',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUtilizadoresRoute =
+  AuthenticatedUtilizadoresRouteImport.update({
+    id: '/utilizadores',
+    path: '/utilizadores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedVendasRoute = AuthenticatedVendasRouteImport.update({
   id: '/vendas',
   path: '/vendas',
@@ -70,8 +95,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
+  '/governacao': typeof AuthenticatedGovernacaoRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/projetos': typeof AuthenticatedProjetosRoute
+  '/rh': typeof AuthenticatedRhRoute
+  '/utilizadores': typeof AuthenticatedUtilizadoresRoute
   '/vendas': typeof AuthenticatedVendasRoute
 }
 export interface FileRoutesByTo {
@@ -80,8 +109,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
+  '/governacao': typeof AuthenticatedGovernacaoRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/projetos': typeof AuthenticatedProjetosRoute
+  '/rh': typeof AuthenticatedRhRoute
+  '/utilizadores': typeof AuthenticatedUtilizadoresRoute
   '/vendas': typeof AuthenticatedVendasRoute
 }
 export interface FileRoutesById {
@@ -92,8 +125,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dividas': typeof AuthenticatedDividasRoute
   '/_authenticated/financas': typeof AuthenticatedFinancasRoute
+  '/_authenticated/governacao': typeof AuthenticatedGovernacaoRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
+  '/_authenticated/rh': typeof AuthenticatedRhRoute
+  '/_authenticated/utilizadores': typeof AuthenticatedUtilizadoresRoute
   '/_authenticated/vendas': typeof AuthenticatedVendasRoute
 }
 export interface FileRouteTypes {
@@ -104,8 +141,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dividas'
     | '/financas'
+    | '/governacao'
     | '/painel'
     | '/produtos'
+    | '/projetos'
+    | '/rh'
+    | '/utilizadores'
     | '/vendas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -114,8 +155,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dividas'
     | '/financas'
+    | '/governacao'
     | '/painel'
     | '/produtos'
+    | '/projetos'
+    | '/rh'
+    | '/utilizadores'
     | '/vendas'
   id:
     | '__root__'
@@ -125,8 +170,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dividas'
     | '/_authenticated/financas'
+    | '/_authenticated/governacao'
     | '/_authenticated/painel'
     | '/_authenticated/produtos'
+    | '/_authenticated/projetos'
+    | '/_authenticated/rh'
+    | '/_authenticated/utilizadores'
     | '/_authenticated/vendas'
   fileRoutesById: FileRoutesById
 }
@@ -181,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/governacao': {
+      id: '/_authenticated/governacao'
+      path: '/governacao'
+      fullPath: '/governacao'
+      preLoaderRoute: typeof AuthenticatedGovernacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -193,6 +249,27 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof AuthenticatedProdutosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projetos': {
+      id: '/_authenticated/projetos'
+      path: '/projetos'
+      fullPath: '/projetos'
+      preLoaderRoute: typeof AuthenticatedProjetosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh': {
+      id: '/_authenticated/rh'
+      path: '/rh'
+      fullPath: '/rh'
+      preLoaderRoute: typeof AuthenticatedRhRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/utilizadores': {
+      id: '/_authenticated/utilizadores'
+      path: '/utilizadores'
+      fullPath: '/utilizadores'
+      preLoaderRoute: typeof AuthenticatedUtilizadoresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vendas': {
@@ -208,16 +285,24 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDividasRoute: typeof AuthenticatedDividasRoute
   AuthenticatedFinancasRoute: typeof AuthenticatedFinancasRoute
+  AuthenticatedGovernacaoRoute: typeof AuthenticatedGovernacaoRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRoute
+  AuthenticatedRhRoute: typeof AuthenticatedRhRoute
+  AuthenticatedUtilizadoresRoute: typeof AuthenticatedUtilizadoresRoute
   AuthenticatedVendasRoute: typeof AuthenticatedVendasRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDividasRoute: AuthenticatedDividasRoute,
   AuthenticatedFinancasRoute: AuthenticatedFinancasRoute,
+  AuthenticatedGovernacaoRoute: AuthenticatedGovernacaoRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedProjetosRoute: AuthenticatedProjetosRoute,
+  AuthenticatedRhRoute: AuthenticatedRhRoute,
+  AuthenticatedUtilizadoresRoute: AuthenticatedUtilizadoresRoute,
   AuthenticatedVendasRoute: AuthenticatedVendasRoute,
 }
 

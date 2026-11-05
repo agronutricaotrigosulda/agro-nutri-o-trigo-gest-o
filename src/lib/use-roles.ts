@@ -16,7 +16,7 @@ export function useMe() {
         user: u.user,
         roles,
         isGestao: has("socio_fundador", "socio", "gerente", "diretor"),
-        canSell: has("vendedor", "gerente", "socio_fundador"),
+        canSell: has("vendedor", "gerente"),
         isDirecao: has("socio_fundador", "gerente", "diretor"),
         isSocio: has("socio_fundador", "socio"),
       };
