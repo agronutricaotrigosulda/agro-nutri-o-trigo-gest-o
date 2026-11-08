@@ -11,14 +11,24 @@ export function useMe() {
       if (!u.user) return null;
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id);
       const roles = (data ?? []).map((r) => r.role as Role);
-      const has = (...r: Role[]) => r.some((x) => roles.includes(x));
+      const { data: access, error } = await supabase.from("user_access").select("*").eq("user_id", u.user.id).maybeSingle();
+      if (error) throw error;
+      const active = access?.status === "ativo";
+      const level = access?.access_level;
+      const partner = active && level === "socios";
+      const manager = active && level === "gerentes";
       return {
         user: u.user,
         roles,
-        isGestao: has("socio_fundador", "socio", "gerente", "diretor"),
-        canSell: has("vendedor", "gerente"),
-        isDirecao: has("socio_fundador", "gerente", "diretor"),
-        isSocio: has("socio_fundador", "socio"),
+        access,
+        isGestao: partner || manager,
+        canSell: partner || manager || (active && level === "funcionario" && access.sales_enabled),
+        isDirecao: partner || manager,
+        isSocio: partner,
+        canHR: partner || (active && level === "rh"),
+        canFinance: partner || manager || (active && level === "financas"),
+        canMarketing: partner || (active && level === "marketing"),
+        canManageUsers: partner || manager,
       };
     },
   });

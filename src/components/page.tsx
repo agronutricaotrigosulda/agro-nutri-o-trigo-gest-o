@@ -15,7 +15,10 @@ export function PageTitle({ title, subtitle, action }: { title: string; subtitle
 
 export async function uploadProof(file: File | null | undefined, folder: string): Promise<string | null> {
   if (!file) return null;
-  const path = `${folder}/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+  if (!file.type.startsWith("image/") && file.type !== "application/pdf") throw new Error("Anexe uma foto ou PDF");
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Inicie sessão");
+  const path = `${folder}/${auth.user.id}/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g, "_")}`;
   const { error } = await supabase.storage.from("comprovativos").upload(path, file);
   if (error) throw error;
   return path;
