@@ -12,4 +12,5 @@
 ## Architecture rules
 - Business rules (budget alerts, holidays, payroll, quorum, discounts) live in `src/lib/rules.ts` with tests in `src/test/rules.test.ts`; why: single tested source of truth.
 - Sale price/discount rules are also enforced by the `validate_sale` DB trigger; why: sellers cannot bypass the UI.
-- Roles live in `user_roles`, checked via `has_role`/`is_gestao`/`can_sell`; the first account becomes Sócio Fundador + Gerente; why: avoid privilege escalation.
+- Six access levels, area, position, status and sales permission live in protected `user_access`; legacy `user_roles` retains founder identity only, and the first account becomes a partner; why: independent institutional positions must not grant confidential access.
+- Critical employee, payroll, payment and governance transitions use authenticated database functions and immutable audit events; why: enforce ownership, concurrency and duplicate prevention beyond the UI.
