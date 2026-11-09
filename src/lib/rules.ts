@@ -62,7 +62,7 @@ export function faltaDentroDoPrazo(absenceDate: Date, submitted: Date = new Date
 }
 
 export function mesDescontoFalta(date: string): string {
-  const [year, month, day] = date.split("-").map(Number);
+  const [year = 0, month = 1, day = 1] = date.split("-").map(Number);
   const d = new Date(Date.UTC(year, month - 1 + (day >= 10 ? 1 : 0), 1));
   return d.toISOString().slice(0, 7);
 }
