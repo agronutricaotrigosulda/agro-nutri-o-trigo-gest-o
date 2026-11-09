@@ -4,7 +4,8 @@ import { LayoutDashboard, ShoppingCart, Tags, Wallet, HandCoins, Landmark, Users
 import { supabase } from "@/integrations/supabase/client";
 import emblema from "@/assets/emblema-centrado.png.asset.json";
 import { useMe } from "@/lib/use-roles";
-import { ROLE_LABEL } from "@/lib/format";
+import { ACCESS_LABEL, type AccessLevel } from "@/lib/format";
+import { Button } from "@/components/ui/button";
 import { InstallButton } from "@/components/install-button";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton,
@@ -23,14 +24,15 @@ export const Route = createFileRoute("/_authenticated")({
 type Item = { to: string; label: string; icon: any; show: (m: NonNullable<ReturnType<typeof useMe>["data"]>) => boolean };
 const ITEMS: Item[] = [
   { to: "/painel", label: "Painel", icon: LayoutDashboard, show: () => true },
+  { to: "/colaborador", label: "Portal do Colaborador", icon: Users, show: () => true },
   { to: "/vendas", label: "Vendas", icon: ShoppingCart, show: (m) => m.canSell },
   { to: "/produtos", label: "Preços e Produtos", icon: Tags, show: (m) => m.isDirecao },
-  { to: "/financas", label: "Finanças", icon: Wallet, show: (m) => m.isGestao },
-  { to: "/dividas", label: "Dívidas", icon: HandCoins, show: (m) => m.isGestao },
-  { to: "/governacao", label: "Governação", icon: Landmark, show: (m) => m.isGestao },
-  { to: "/rh", label: "Recursos Humanos", icon: Users, show: (m) => m.isGestao },
-  { to: "/projetos", label: "Projetos e Tarefas", icon: FolderKanban, show: () => true },
-  { to: "/utilizadores", label: "Utilizadores", icon: UserCog, show: (m) => m.roles.includes("gerente") || m.roles.includes("socio_fundador") },
+  { to: "/financas", label: "Finanças", icon: Wallet, show: (m) => m.canFinance },
+  { to: "/dividas", label: "Dívidas", icon: HandCoins, show: (m) => m.canFinance },
+  { to: "/governacao", label: "Portal dos Sócios", icon: Landmark, show: (m) => m.isSocio },
+  { to: "/rh", label: "Recursos Humanos", icon: Users, show: (m) => m.canHR },
+  { to: "/projetos", label: "Projetos e Tarefas", icon: FolderKanban, show: (m) => m.access?.status==="ativo" },
+  { to: "/utilizadores", label: "Utilizadores", icon: UserCog, show: (m) => m.canManageUsers },
 ];
 
 function Nav() {
@@ -68,8 +70,8 @@ function Nav() {
       </SidebarContent>
       <SidebarFooter className="p-3 text-xs">
         <div className="truncate opacity-90">{me?.user.email}</div>
-        <div className="opacity-70">{me?.roles.map((r) => ROLE_LABEL[r]).join(", ") || "Sem perfil atribuído"}</div>
-        <button onClick={logout} className="mt-2 flex items-center gap-2 opacity-90 hover:opacity-100"><LogOut className="h-4 w-4" /> Sair</button>
+        <div className="opacity-70">{me?.access?ACCESS_LABEL[me.access.access_level as AccessLevel]:"Sem perfil atribuído"}</div>
+        <Button variant="ghost" size="sm" onClick={logout} className="mt-2"><LogOut className="h-4 w-4" /> Sair</Button>
       </SidebarFooter>
     </Sidebar>
   );

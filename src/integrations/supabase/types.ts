@@ -724,6 +724,7 @@ export type Database = {
           id: string
           mode: string
           product_id: string
+          proof_path: string | null
           quantity: number
           seller_id: string
           total: number
@@ -737,6 +738,7 @@ export type Database = {
           id?: string
           mode: string
           product_id: string
+          proof_path?: string | null
           quantity: number
           seller_id?: string
           total?: number
@@ -750,6 +752,7 @@ export type Database = {
           id?: string
           mode?: string
           product_id?: string
+          proof_path?: string | null
           quantity?: number
           seller_id?: string
           total?: number
@@ -975,6 +978,10 @@ export type Database = {
       access_level_for: { Args: { _id: string }; Returns: string }
       area_access: { Args: { _area: string; _id: string }; Returns: boolean }
       can_sell: { Args: { _user_id: string }; Returns: boolean }
+      cast_resolution_vote: {
+        Args: { _id: string; _vote: string }
+        Returns: undefined
+      }
       complete_task: {
         Args: { _done: boolean; _id: string }
         Returns: undefined
@@ -996,6 +1003,31 @@ export type Database = {
       }
       is_gestao: { Args: { _user_id: string }; Returns: boolean }
       is_partner: { Args: { _id: string }; Returns: boolean }
+      pay_payroll: {
+        Args: {
+          _amount: number
+          _event: string
+          _id: string
+          _proof: string
+          _reason: string
+        }
+        Returns: undefined
+      }
+      prepare_payroll: { Args: { _period: string }; Returns: undefined }
+      set_access: {
+        Args: {
+          _area: string
+          _level: string
+          _position: string
+          _reason: string
+          _sales: boolean
+          _status: string
+          _user: string
+        }
+        Returns: undefined
+      }
+      sign_payroll_employee: { Args: { _id: string }; Returns: undefined }
+      sign_payroll_hr: { Args: { _id: string }; Returns: undefined }
       submit_absence_proof: {
         Args: { _absence: string; _proof: string; _reason: string }
         Returns: undefined

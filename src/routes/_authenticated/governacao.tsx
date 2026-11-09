@@ -35,19 +35,16 @@ function Gov() {
     },
   });
   const [sh, setSh] = useState({ name: "", capital_pct: "", founder: false });
-  const [res, setRes] = useState({ title: "", description: "" });
+  const [res, setRes] = useState({ title: "", description: "", qualified_quorum:true });
   const [apr, setApr] = useState({ title: "", amount: "" });
-  if (me && !me.isGestao) return <NoAccess />;
+  if (me && !me.isSocio) return <NoAccess />;
   const shs = data?.sh ?? [];
   const totalCap = shs.reduce((a, s) => a + Number(s.capital_pct), 0);
   const refresh = () => qc.invalidateQueries({ queryKey: ["gov"] });
 
   async function vote(r: any, shId: string, v: "favor" | "contra" | "veto") {
-    const { error } = await supabase.from("resolution_votes").upsert({ resolution_id: r.id, shareholder_id: shId, vote: v }, { onConflict: "resolution_id,shareholder_id" });
+    const { error } = await supabase.rpc("cast_resolution_vote",{_id:r.id,_vote:v});
     if (error) return toast.error(error.message);
-    const votes = [...(r.resolution_votes ?? []).filter((x: any) => x.shareholder_id !== shId), { shareholder_id: shId, vote: v }];
-    const result = deliberacao(votes.map((x: any) => { const s = shs.find((y) => y.id === x.shareholder_id)!; return { capital_pct: Number(s.capital_pct), founder: s.founder, vote: x.vote }; }));
-    await supabase.from("resolutions").update({ status: result === "pendente" ? "aberta" : result }).eq("id", r.id);
     refresh();
   }
   async function decide(id: string, status: "aprovado" | "rejeitado") {
@@ -94,7 +91,7 @@ function Gov() {
                 setApr({ title: "", amount: "" }); refresh();
               }}>Submeter</Button>
             </div>
-            <p className="text-xs text-muted-foreground">Até 50.000 MT: Diretor · até 500.000 MT: Gerente/CEO · acima: Sócios</p>
+            <p className="text-xs text-muted-foreground">Até <Money value={50000}/>: Diretor · até <Money value={500000}/>: Gerente/CEO · acima: Sócios</p>
             {(data?.apr ?? []).map((a) => (
               <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm">
                 <span>{a.title} · <Money value={a.amount} /> · <em>{LEVEL[a.level as keyof typeof LEVEL]}</em></span>
@@ -112,7 +109,8 @@ function Gov() {
           <div className="flex flex-wrap gap-2">
             <Input placeholder="Título" value={res.title} onChange={(e) => setRes({ ...res, title: e.target.value })} className="max-w-xs" />
             <Input placeholder="Descrição" value={res.description} onChange={(e) => setRes({ ...res, description: e.target.value })} className="max-w-md" />
-            <Button onClick={async () => { if (!res.title) return; await supabase.from("resolutions").insert(res); setRes({ title: "", description: "" }); refresh(); }}>Abrir deliberação</Button>
+            <label className="flex items-center gap-2 text-sm"><Switch checked={res.qualified_quorum} onCheckedChange={v=>setRes({...res,qualified_quorum:v})}/>Exige 70% do capital</label>
+            <Button onClick={async () => { if (!res.title) return; const {error}=await supabase.from("resolutions").insert(res);if(error)return toast.error(error.message);setRes({ title: "", description: "",qualified_quorum:true }); refresh(); }}>Abrir deliberação</Button>
           </div>
           {(data?.res ?? []).map((r: any) => {
             const favor = (r.resolution_votes ?? []).filter((v: any) => v.vote === "favor").reduce((a: number, v: any) => a + Number(shs.find((s) => s.id === v.shareholder_id)?.capital_pct ?? 0), 0);
@@ -124,7 +122,7 @@ function Gov() {
                 </div>
                 {r.status === "aberta" && me?.isSocio && (
                   <div className="mt-2 space-y-1">
-                    {shs.map((s) => {
+                    {shs.filter(s=>s.user_id===me.user.id).map((s) => {
                       const v = (r.resolution_votes ?? []).find((x: any) => x.shareholder_id === s.id)?.vote;
                       return (
                         <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">

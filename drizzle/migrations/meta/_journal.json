@@ -29,6 +29,13 @@
       "when": 1794119819976,
       "tag": "0003_six_levels_and_employee_workflows",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794200631929,
+      "tag": "0004_atomic_access_payroll_and_votes",
+      "breakpoints": true
     }
   ]
 }

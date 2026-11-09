@@ -66,7 +66,7 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
   --background: oklch(0.985 0.008 100);
   --foreground: oklch(0.22 0.04 140);
   --card: oklch(1 0 0);
@@ -152,5 +152,5 @@
 }
 
 @layer base {
-  h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0.02em; }
+  h1, h2, h3 { font-family: var(--font-sans); font-weight: 600; letter-spacing: 0; }
 }

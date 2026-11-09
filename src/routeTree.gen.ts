@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedColaboradorRouteImport } from './routes/_authenticated/colaborador'
 import { Route as AuthenticatedDividasRouteImport } from './routes/_authenticated/dividas'
 import { Route as AuthenticatedFinancasRouteImport } from './routes/_authenticated/financas'
 import { Route as AuthenticatedGovernacaoRouteImport } from './routes/_authenticated/governacao'
@@ -42,6 +43,12 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedColaboradorRoute =
+  AuthenticatedColaboradorRouteImport.update({
+    id: '/colaborador',
+    path: '/colaborador',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDividasRoute = AuthenticatedDividasRouteImport.update({
   id: '/dividas',
   path: '/dividas',
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/colaborador': typeof AuthenticatedColaboradorRoute
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/colaborador': typeof AuthenticatedColaboradorRoute
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/colaborador': typeof AuthenticatedColaboradorRoute
   '/_authenticated/dividas': typeof AuthenticatedDividasRoute
   '/_authenticated/financas': typeof AuthenticatedFinancasRoute
   '/_authenticated/governacao': typeof AuthenticatedGovernacaoRoute
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/colaborador'
     | '/dividas'
     | '/financas'
     | '/governacao'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/colaborador'
     | '/dividas'
     | '/financas'
     | '/governacao'
@@ -168,6 +180,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/colaborador'
     | '/_authenticated/dividas'
     | '/_authenticated/financas'
     | '/_authenticated/governacao'
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/colaborador': {
+      id: '/_authenticated/colaborador'
+      path: '/colaborador'
+      fullPath: '/colaborador'
+      preLoaderRoute: typeof AuthenticatedColaboradorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dividas': {
       id: '/_authenticated/dividas'
@@ -283,6 +303,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedColaboradorRoute: typeof AuthenticatedColaboradorRoute
   AuthenticatedDividasRoute: typeof AuthenticatedDividasRoute
   AuthenticatedFinancasRoute: typeof AuthenticatedFinancasRoute
   AuthenticatedGovernacaoRoute: typeof AuthenticatedGovernacaoRoute
@@ -295,6 +316,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedColaboradorRoute: AuthenticatedColaboradorRoute,
   AuthenticatedDividasRoute: AuthenticatedDividasRoute,
   AuthenticatedFinancasRoute: AuthenticatedFinancasRoute,
   AuthenticatedGovernacaoRoute: AuthenticatedGovernacaoRoute,

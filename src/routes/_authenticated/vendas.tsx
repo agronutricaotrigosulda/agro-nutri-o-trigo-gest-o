@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Money } from "@/lib/format";
-import { NoAccess, PageTitle } from "@/components/page";
+import { NoAccess, PageTitle, uploadProof } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 import { validarVenda } from "@/lib/rules";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,7 @@ function Vendas() {
   const [customPrice, setCustomPrice] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [proofFile,setProofFile]=useState<File>();
 
   const p = products.find((x) => x.id === pid);
   const base = p ? Number(mode === "grosso" ? p.price_wholesale : p.price_retail) : 0;
@@ -55,18 +56,23 @@ function Vendas() {
   if (me && !me.canSell) return <NoAccess />;
 
   async function registar() {
-    if (!p) return;
+    if (!p || !me) return;
     if (error) return toast.error(error);
+    if(!proofFile)return toast.error("Anexe o comprovativo do recebimento");
     setBusy(true);
+    try {
+    const proof=await uploadProof(proofFile,"vendas");
     const { error: e } = await supabase.from("sales").insert({
       product_id: p.id, mode, quantity: Number(qty), unit_price: unit, discount_pct: Number(disc || 0),
-      exception_reason: exception ? reason.trim() : null, seller_id: me!.user.id,
+      exception_reason: exception ? reason.trim() : null, seller_id: me.user.id, proof_path:proof,
     });
     setBusy(false);
     if (e) return toast.error(e.message);
     toast.success("Venda registada");
     setQty("1"); setDisc("0"); setException(false); setCustomPrice(""); setReason("");
     qc.invalidateQueries({ queryKey: ["sales"] }); qc.invalidateQueries({ queryKey: ["painel"] });
+    setProofFile(undefined);
+    }catch(e){toast.error(e instanceof Error?e.message:"Não foi possível registar");}finally{setBusy(false);}
   }
 
   return (
@@ -112,6 +118,7 @@ function Vendas() {
             )}
             <div className="flex items-center justify-between border-t pt-3"><span>Total</span><Money value={total} className="text-2xl font-bold text-primary" /></div>
             {p && error && <p className="text-sm text-destructive">{error}</p>}
+            <Label>Comprovativo do recebimento</Label><Input aria-label="Comprovativo do recebimento" type="file" accept="image/*,application/pdf" onChange={e=>setProofFile(e.target.files?.[0])}/>
             <Button className="w-full" size="lg" disabled={!p || busy || !!error || Number(qty) <= 0} onClick={registar}>Registar venda</Button>
           </CardContent>
         </Card>

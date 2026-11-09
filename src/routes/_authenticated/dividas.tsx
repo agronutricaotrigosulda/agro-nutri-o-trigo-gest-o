@@ -23,7 +23,7 @@ function Dividas() {
   const [dir, setDir] = useState<"pagar" | "receber">("pagar");
   const { data: debts = [] } = useQuery({ queryKey: ["debts"], queryFn: async () => (await supabase.from("debts").select("*, debt_payments(*)").order("created_at", { ascending: false })).data ?? [] });
   const [n, setN] = useState({ party: "", description: "", amount: "", due_date: "" });
-  if (me && !me.isGestao) return <NoAccess />;
+  if (me && !me.canFinance) return <NoAccess />;
 
   async function add() {
     if (!n.party || !Number(n.amount)) return toast.error("Indique a entidade e o valor");
@@ -33,6 +33,7 @@ function Dividas() {
   }
   async function pay(debtId: string, amount: number, file: File | undefined) {
     try {
+      if (!file || amount <= 0) throw new Error("Valor positivo e comprovativo obrigatórios");
       const proof = await uploadProof(file, "dividas");
       const { error } = await supabase.from("debt_payments").insert({ debt_id: debtId, amount, proof_path: proof });
       if (error) throw error;
