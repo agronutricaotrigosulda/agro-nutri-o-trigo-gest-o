@@ -1,77 +1,29 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ROLE_LABEL } from "@/lib/format";
-import { NoAccess, PageTitle } from "@/components/page";
-import { useMe, type Role } from "@/lib/use-roles";
-import { inviteUser, setUserRole } from "@/lib/admin.functions";
-
-export const Route = createFileRoute("/_authenticated/utilizadores")({
-  head: () => ({ meta: [{ title: "Utilizadores — Agro-Nutrição Trigo" }, { name: "description", content: "Convidar funcionários e atribuir perfis." }, { property: "og:title", content: "Utilizadores — Agro-Nutrição Trigo" }, { property: "og:description", content: "Gestão de acessos." }] }),
-  component: Users,
-});
-
-const ROLES = Object.keys(ROLE_LABEL) as Role[];
-
+import { createFileRoute } from '@tanstack/react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ACCESS_LABEL, POSITIONS, type AccessLevel } from '@/lib/format';
+import { NoAccess, PageTitle } from '@/components/page';
+import { useMe } from '@/lib/use-roles';
+import { inviteUser } from '@/lib/admin.functions';
+import { appHead } from '@/lib/metadata';
+export const Route = createFileRoute('/_authenticated/utilizadores')({ head: () => appHead('Utilizadores', 'Seis níveis de acesso, cargos e convites seguros.'), component: Users });
+const initial = { email: '', fullName: '', level: 'funcionario' as AccessLevel, area: '', position: '', sales: false };
 function Users() {
-  const { data: me } = useMe();
-  const qc = useQueryClient();
-  const invite = useServerFn(inviteUser);
-  const setRole = useServerFn(setUserRole);
-  const { data } = useQuery({
-    queryKey: ["users"],
-    queryFn: async () => {
-      const [p, r] = await Promise.all([supabase.from("profiles").select("*").order("full_name"), supabase.from("user_roles").select("*")]);
-      return { p: p.data ?? [], r: r.data ?? [] };
-    },
-  });
-  const [f, setF] = useState({ email: "", fullName: "", role: "funcionario" as Role });
-  const [busy, setBusy] = useState(false);
-  if (me && !(me.roles.includes("gerente") || me.roles.includes("socio_fundador"))) return <NoAccess />;
-
-  return (
-    <>
-      <PageTitle title="Utilizadores" subtitle="O funcionário recebe um link de ativação por e-mail e define a sua senha" />
-      <Card className="mb-5"><CardHeader><CardTitle className="text-lg">Convidar funcionário</CardTitle></CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Input placeholder="Nome completo" value={f.fullName} onChange={(e) => setF({ ...f, fullName: e.target.value })} className="max-w-[220px]" />
-          <Input placeholder="E-mail" type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} className="max-w-[240px]" />
-          <select className="rounded-md border bg-background px-2 text-sm" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value as Role })}>
-            {ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
-          </select>
-          <Button disabled={busy} onClick={async () => {
-            setBusy(true);
-            try { await invite({ data: { ...f, redirectTo: `${window.location.origin}/reset-password` } }); toast.success("Convite enviado"); setF({ email: "", fullName: "", role: "funcionario" }); qc.invalidateQueries({ queryKey: ["users"] }); }
-            catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
-          }}>Enviar convite</Button>
-        </CardContent>
-      </Card>
-      <Card><CardContent className="space-y-3 pt-4">
-        {(data?.p ?? []).map((u) => {
-          const has = (r: Role) => (data?.r ?? []).some((x) => x.user_id === u.id && x.role === r);
-          return (
-            <div key={u.id} className="rounded-md border p-3">
-              <div className="font-semibold">{u.full_name} <span className="text-sm font-normal text-muted-foreground">{u.email}</span></div>
-              <div className="mt-2 flex flex-wrap gap-3">
-                {ROLES.map((r) => (
-                  <label key={r} className="flex items-center gap-1 text-sm">
-                    <Checkbox checked={has(r)} onCheckedChange={async (v) => {
-                      try { await setRole({ data: { userId: u.id, role: r, add: !!v } }); qc.invalidateQueries(); } catch (e: any) { toast.error(e.message); }
-                    }} /> {ROLE_LABEL[r]}
-                  </label>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </CardContent></Card>
-    </>
-  );
+ const { data: me } = useMe(); const qc = useQueryClient(); const invite = useServerFn(inviteUser);
+ const { data } = useQuery({queryKey:['users'], queryFn:async()=>{const [p,a]=await Promise.all([supabase.from('profiles').select('*').order('full_name'),supabase.from('user_access').select('*')]);if(p.error)throw p.error;if(a.error)throw a.error;return {p:p.data,a:a.data};}});
+ const [f,setF]=useState(initial); const [busy,setBusy]=useState(false);
+ if(me && !me.canManageUsers)return <NoAccess/>;
+ return <><PageTitle title="Utilizadores"/><section className="border-b pb-6"><h2 className="mb-3 text-lg">Convidar funcionário</h2><div className="grid gap-3 sm:grid-cols-3"><Input aria-label="Nome completo" placeholder="Nome completo" value={f.fullName} onChange={e=>setF({...f,fullName:e.target.value})}/><Input aria-label="E-mail" type="email" placeholder="E-mail" value={f.email} onChange={e=>setF({...f,email:e.target.value})}/><select aria-label="Nível de acesso" className="rounded-md border bg-background p-2 text-sm" value={f.level} onChange={e=>setF({...f,level:e.target.value as AccessLevel})}>{Object.entries(ACCESS_LABEL).filter(([k])=>me?.isSocio||k!=='socios').map(([k,v])=><option key={k} value={k}>{v}</option>)}</select><Input aria-label="Área" placeholder="Área" value={f.area} onChange={e=>setF({...f,area:e.target.value})}/><select aria-label="Cargo" className="rounded-md border bg-background p-2 text-sm" value={f.position} onChange={e=>setF({...f,position:e.target.value})}><option value="">Cargo institucional</option>{POSITIONS.map(p=><option key={p}>{p}</option>)}</select>{f.level==='funcionario'&&<label className="flex items-center gap-2 text-sm"><Checkbox checked={f.sales} onCheckedChange={v=>setF({...f,sales:v===true})}/>Permitir registo de vendas</label>}</div><Button className="mt-3" disabled={busy} onClick={async()=>{setBusy(true);try{await invite({data:{...f,redirectTo:`${window.location.origin}/reset-password`}});toast.success('Link de ativação enviado');setF(initial);qc.invalidateQueries({queryKey:['users']});}catch(e){toast.error(e instanceof Error?e.message:'Não foi possível enviar o convite');}finally{setBusy(false);}}}>Enviar link seguro</Button></section><section className="mt-5 space-y-4">{data?.p.map(u=>{const a=data.a.find(x=>x.user_id===u.id);return <AccessEditor key={u.id} user={u} access={a} partner={!!me?.isSocio} self={u.id===me?.user.id} refresh={()=>qc.invalidateQueries()}/>;})}</section><ContactsEditor/></>;
 }
+function AccessEditor({user,access,partner,self,refresh}:{user:{id:string;full_name:string|null;email:string|null};access:{access_level:string;area:string|null;position:string|null;sales_enabled:boolean;status:string}|undefined;partner:boolean;self:boolean;refresh:()=>void}){
+ const [level,setLevel]=useState(access?.access_level??'funcionario');const [area,setArea]=useState(access?.area??'');const [position,setPosition]=useState(access?.position??'');const [sales,setSales]=useState(access?.sales_enabled??false);const [status,setStatus]=useState(access?.status??'ativo');const [reason,setReason]=useState('');
+ const disabled=self||(!partner&&access?.access_level==='socios');
+ return <div className="rounded-lg border bg-card p-4"><p className="font-semibold">{user.full_name}</p><p className="break-all text-sm text-muted-foreground">{user.email}</p><div className="mt-3 grid gap-2 sm:grid-cols-3"><select disabled={disabled} aria-label={`Acesso de ${user.full_name}`} className="rounded-md border bg-background p-2 text-sm" value={level} onChange={e=>setLevel(e.target.value)}>{Object.entries(ACCESS_LABEL).filter(([k])=>partner||k!=='socios'||level==='socios').map(([k,v])=><option key={k} value={k}>{v}</option>)}</select><Input disabled={disabled} placeholder="Área" value={area} onChange={e=>setArea(e.target.value)}/><select disabled={disabled} aria-label="Cargo institucional" className="rounded-md border bg-background p-2 text-sm" value={position} onChange={e=>setPosition(e.target.value)}><option value="">Sem cargo definido</option>{POSITIONS.map(p=><option key={p}>{p}</option>)}</select><select disabled={disabled} aria-label="Estado do acesso" className="rounded-md border bg-background p-2 text-sm" value={status} onChange={e=>setStatus(e.target.value)}><option value="ativo">Ativo</option><option value="suspenso">Suspenso</option><option value="exonerado">Exonerado</option></select>{level==='funcionario'&&<label className="flex items-center gap-2 text-sm"><Checkbox disabled={disabled} checked={sales} onCheckedChange={v=>setSales(v===true)}/>Permitir registo de vendas</label>}<Input disabled={disabled} placeholder="Justificação da alteração" value={reason} onChange={e=>setReason(e.target.value)}/></div><Button className="mt-3" size="sm" disabled={disabled} onClick={async()=>{const {error}=await supabase.rpc('set_access',{_user:user.id,_level:level,_area:area,_position:position,_sales:sales,_status:status,_reason:reason});if(error)return toast.error(error.message);toast.success('Acesso atualizado');refresh();}}>Guardar acesso</Button></div>;
+}
+function ContactsEditor(){const [f,setF]=useState({position:'Gerente',name:'',contact:'',email:''});const qc=useQueryClient();return <section className="mt-8 border-t pt-4"><h2 className="mb-3 text-lg">Contactos úteis</h2><div className="grid gap-2 sm:grid-cols-4"><select className="rounded-md border bg-background p-2 text-sm" value={f.position} onChange={e=>setF({...f,position:e.target.value})}><option>Gerente</option><option>RH</option><option>Director Administrativo</option></select>{(['name','contact','email'] as const).map(k=><Input key={k} placeholder={{name:'Nome',contact:'Contacto',email:'E-mail'}[k]} value={f[k]} onChange={e=>setF({...f,[k]:e.target.value})}/>)}</div><Button className="mt-3" size="sm" onClick={async()=>{if(!f.name)return;const {error}=await supabase.from('company_contacts').insert(f);if(error)return toast.error(error.message);setF({...f,name:'',contact:'',email:''});qc.invalidateQueries({queryKey:['contacts']});toast.success('Contacto adicionado');}}>Adicionar contacto</Button></section>}
