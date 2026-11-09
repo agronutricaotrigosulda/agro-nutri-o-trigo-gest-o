@@ -39,7 +39,7 @@ function Financas() {
     },
   });
   const [n, setN] = useState({ category: "", planned: "" });
-  if (me && !me.isGestao) return <NoAccess />;
+  if (me && !me.canFinance) return <NoAccess />;
   const gastoOrc = budgets.reduce((a, b) => a + Number(b.spent), 0);
   const saidas = (totals?.saidas ?? 0) + gastoOrc;
   const lucro = (totals?.faturamento ?? 0) - saidas;
@@ -94,14 +94,14 @@ function Financas() {
         </CardContent>
       </Card>
 
-      <Card className="mt-6">
+      {me?.isSocio && <Card className="mt-6">
         <CardHeader><CardTitle className="text-lg">Distribuição estatutária do lucro</CardTitle></CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-4">
           {[["Reserva legal (25%)", dist.legal], ["Reinvestimento (20%)", dist.reinvestimento], ["Distribuição a sócios (50%)", dist.socios], ["Ação social (5%)", dist.social]].map(([l, v]) => (
             <div key={l as string} className="rounded-lg bg-accent p-3"><div className="text-xs text-accent-foreground">{l}</div><Money value={v as number} className="text-lg font-bold" /></div>
           ))}
         </CardContent>
-      </Card>
+      </Card>}
     </>
   );
 }

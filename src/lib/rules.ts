@@ -35,14 +35,10 @@ export function deliberacao(
   return "pendente";
 }
 
-/** Férias cumulativas: 15 dias no 1º ano, 24 no 2º, 30 a partir do 3º. */
-export function feriasAcumuladas(hireDate: Date, today: Date = new Date()): number {
-  const ms = today.getTime() - hireDate.getTime();
-  if (ms < 0) return 0;
-  const anosIniciados = Math.floor(ms / (365.25 * 24 * 3600 * 1000)) + 1;
-  let total = 0;
-  for (let ano = 1; ano <= anosIniciados; ano++) total += ano === 1 ? 15 : ano === 2 ? 24 : 30;
-  return total;
+/** Acumulação mensal: contrato indeterminado 12/30; determinado um dia/mês. */
+export function feriasAcumuladas(hireDate: Date, today: Date = new Date(), contract = "indeterminado"): number {
+  const months = Math.max(0, (today.getUTCFullYear() - hireDate.getUTCFullYear()) * 12 + today.getUTCMonth() - hireDate.getUTCMonth() - (today.getUTCDate() < hireDate.getUTCDate() ? 1 : 0));
+  return contract === "determinado" ? months : Math.min(months, 12) + Math.max(0, months - 12) * 2.5;
 }
 
 /** Folha salarial: INSS do trabalhador 3%, da empresa 4%; sindicato opcional. */
@@ -61,7 +57,24 @@ export function faixaDesempenho(score: number): string {
 
 /** Comprovativo de falta tem de ser entregue até 48h depois da falta. */
 export function faltaDentroDoPrazo(absenceDate: Date, submitted: Date = new Date()): boolean {
-  return submitted.getTime() - absenceDate.getTime() <= 48 * 3600 * 1000;
+  const elapsed = submitted.getTime() - absenceDate.getTime();
+  return elapsed >= 0 && elapsed <= 48 * 3600 * 1000;
+}
+
+export function mesDescontoFalta(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const d = new Date(Date.UTC(year, month - 1 + (day >= 10 ? 1 : 0), 1));
+  return d.toISOString().slice(0, 7);
+}
+export function dataPagamento(period: string, holidays: string[] = []): string {
+  const d = new Date(`${period}-20T12:00:00Z`);
+  if (d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6 || holidays.includes(d.toISOString().slice(0, 10))) d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+export function bonusProjeto(net: number, companyResources: boolean, submitted: string, today: string): number {
+  const start = new Date(submitted); const end = new Date(submitted); end.setUTCFullYear(end.getUTCFullYear() + 1);
+  return new Date(today) >= start && new Date(today) < end ? Math.max(0, net) * (companyResources ? 0.08 : 0.1) : 0;
 }
 
 /** Venda: desconto até ao teto; preço diferente do calculado exige motivo. */
