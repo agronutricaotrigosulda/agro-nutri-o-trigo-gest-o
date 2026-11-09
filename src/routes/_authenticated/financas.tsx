@@ -12,6 +12,7 @@ import { NoAccess, PageTitle } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 import { budgetAlert, distribuirLucro } from "@/lib/rules";
 import { cn } from "@/lib/utils";
+import { Payroll } from "@/components/payroll";
 
 export const Route = createFileRoute("/_authenticated/financas")({
   head: () => ({ meta: [{ title: "Finanças — Agro-Nutrição Trigo" }, { name: "description", content: "Orçamento anual e reservas estatutárias." }, { property: "og:title", content: "Finanças — Agro-Nutrição Trigo" }, { property: "og:description", content: "Orçamento e reservas." }] }),
@@ -60,6 +61,7 @@ function Financas() {
   return (
     <>
       <PageTitle title="Finanças" subtitle={`Exercício ${year} · valores em Meticais`} />
+      <section className="mb-8 border-b pb-6"><h2 className="mb-4 text-xl">Pagamento de salários</h2><Payroll finance /></section>
       <div className="grid gap-4 sm:grid-cols-3">
         <Card><CardContent className="pt-5"><div className="text-xs uppercase text-muted-foreground">Faturamento total</div><Money value={totals?.faturamento} className="text-2xl font-bold" /></CardContent></Card>
         <Card><CardContent className="pt-5"><div className="text-xs uppercase text-muted-foreground">Saída total</div><Money value={saidas} className="text-2xl font-bold" /></CardContent></Card>

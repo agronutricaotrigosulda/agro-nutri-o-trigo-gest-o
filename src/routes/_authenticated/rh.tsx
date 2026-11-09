@@ -14,6 +14,7 @@ import { Money } from "@/lib/format";
 import { NoAccess, PageTitle, openProof, uploadProof } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 import { faixaDesempenho, faltaDentroDoPrazo, feriasAcumuladas, folhaSalarial } from "@/lib/rules";
+import { Payroll } from "@/components/payroll";
 
 export const Route = createFileRoute("/_authenticated/rh")({
   head: () => ({ meta: [{ title: "Recursos Humanos — Agro-Nutrição Trigo" }, { name: "description", content: "Funcionários, folha, férias, avaliações e faltas." }, { property: "og:title", content: "RH — Agro-Nutrição Trigo" }, { property: "og:description", content: "Recursos humanos." }] }),
@@ -26,17 +27,19 @@ function RH() {
   const { data } = useQuery({
     queryKey: ["rh"],
     queryFn: async () => {
-      const [e, ev, ab, va] = await Promise.all([
+      const [e, ev, ab, va, profiles, requests] = await Promise.all([
         supabase.from("employees").select("*").order("full_name"),
         supabase.from("evaluations").select("*").order("created_at", { ascending: false }),
         supabase.from("absences").select("*").order("absence_date", { ascending: false }),
         supabase.from("vacations").select("*"),
+        supabase.from("profiles").select("id,full_name,email"),
+        supabase.from("employee_requests").select("*").order("created_at",{ascending:false}),
       ]);
-      return { emp: e.data ?? [], ev: ev.data ?? [], ab: ab.data ?? [], va: va.data ?? [] };
+      return { emp: e.data ?? [], ev: ev.data ?? [], ab: ab.data ?? [], va: va.data ?? [], profiles:profiles.data??[], requests:requests.data??[] };
     },
   });
   const [n, setN] = useState({ full_name: "", email: "", doc_type: "BI", doc_number: "", position: "", base_salary: "", hire_date: "", union_member: false });
-  if (me && !me.isGestao) return <NoAccess />;
+  if (me && !me.canHR) return <NoAccess />;
   const emp = data?.emp ?? [];
   const refresh = () => qc.invalidateQueries({ queryKey: ["rh"] });
   const name = (id: string) => emp.find((e) => e.id === id)?.full_name ?? "";
@@ -71,13 +74,14 @@ function RH() {
             </div>
             <div className="overflow-x-auto"><Table>
               <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Documento</TableHead><TableHead>Cargo</TableHead><TableHead>Admissão</TableHead><TableHead>Salário</TableHead></TableRow></TableHeader>
-              <TableBody>{emp.map((e) => <TableRow key={e.id}><TableCell>{e.full_name}</TableCell><TableCell>{e.doc_type} {e.doc_number}</TableCell><TableCell>{e.position}</TableCell><TableCell>{e.hire_date}</TableCell><TableCell><Money value={e.base_salary} /></TableCell></TableRow>)}</TableBody>
+              <TableBody>{emp.map((e) => <TableRow key={e.id}><TableCell>{e.full_name}<select aria-label={`Conta de ${e.full_name}`} className="mt-1 block max-w-52 rounded-md border bg-background p-1 text-xs" value={e.user_id??""} onChange={async ev=>{const {error}=await supabase.from("employees").update({user_id:ev.target.value||null}).eq("id",e.id);if(error)return toast.error(error.message);refresh();}}><option value="">Associar conta</option>{data?.profiles.map(p=><option key={p.id} value={p.id}>{p.full_name??p.email}</option>)}</select></TableCell><TableCell>{e.doc_type} {e.doc_number}<div className="mt-2 space-y-1"><Input aria-label="Emissão do documento" type="date" defaultValue={e.doc_issued??""} onBlur={async ev=>{await supabase.from("employees").update({doc_issued:ev.target.value||null}).eq("id",e.id);}}/><Input aria-label="Validade do documento" type="date" defaultValue={e.doc_expires??""} onBlur={async ev=>{await supabase.from("employees").update({doc_expires:ev.target.value||null}).eq("id",e.id);refresh();}}/><Input aria-label="Documento PDF ou foto" type="file" accept="image/*,application/pdf" onChange={async ev=>{try{const proof=await uploadProof(ev.target.files?.[0],"documentos");if(!proof)return;const {error}=await supabase.from("employees").update({doc_path:proof}).eq("id",e.id);if(error)throw error;refresh();toast.success("Documento atualizado");}catch(error){toast.error(error instanceof Error?error.message:"Falha no documento");}}}/>{e.doc_expires&&new Date(e.doc_expires).getTime()-Date.now()<=10*86400000&&<span className="text-xs text-destructive">{new Date(e.doc_expires).getTime()<Date.now()?"Documento vencido":"Vence em até 10 dias"}</span>}</div></TableCell><TableCell>{e.position}<Input aria-label="Área do funcionário" placeholder="Área" defaultValue={e.area??""} onBlur={async ev=>{await supabase.from("employees").update({area:ev.target.value}).eq("id",e.id);}}/><select aria-label="Tipo de contrato" className="mt-1 rounded-md border bg-background p-1 text-xs" value={e.contract_type} onChange={async ev=>{await supabase.from("employees").update({contract_type:ev.target.value}).eq("id",e.id);refresh();}}><option value="indeterminado">Indeterminado</option><option value="determinado">Determinado</option></select><Input aria-label="Número de dependentes" type="number" min="0" defaultValue={e.dependents} onBlur={async ev=>{await supabase.from("employees").update({dependents:Number(ev.target.value)}).eq("id",e.id);}}/></TableCell><TableCell>{e.hire_date}</TableCell><TableCell><Money value={e.base_salary} /></TableCell></TableRow>)}</TableBody>
             </Table></div>
           </CardContent></Card>
         </TabsContent>
 
         <TabsContent value="folha">
-          <Card><CardContent className="overflow-x-auto pt-4"><Table>
+          <Payroll />
+          <Card className="hidden"><CardContent className="overflow-x-auto pt-4"><Table>
             <TableHeader><TableRow><TableHead>Funcionário</TableHead><TableHead>Base</TableHead><TableHead>INSS (3%)</TableHead><TableHead>Sindicato</TableHead><TableHead>Líquido</TableHead><TableHead>INSS empresa (4%)</TableHead></TableRow></TableHeader>
             <TableBody>{emp.map((e) => { const f = folhaSalarial(Number(e.base_salary), e.union_member, Number(e.union_pct)); return (
               <TableRow key={e.id}><TableCell>{e.full_name}</TableCell><TableCell><Money value={f.base} /></TableCell><TableCell><Money value={f.inss} /></TableCell><TableCell>{e.union_member ? <Money value={f.sindicato} /> : "—"}</TableCell><TableCell className="font-semibold"><Money value={f.liquido} /></TableCell><TableCell><Money value={f.inssEmpresa} /></TableCell></TableRow>
@@ -87,9 +91,9 @@ function RH() {
 
         <TabsContent value="ferias">
           <Card><CardContent className="space-y-2 pt-4">
-            <p className="text-xs text-muted-foreground">Cumulativas: 15 dias no 1º ano, 24 no 2º, 30 do 3º em diante.</p>
+            <p className="text-xs text-muted-foreground">Contrato indeterminado: 12 dias no primeiro ano e 30 nos seguintes, acumulados mensalmente. Determinado: um dia por mês.</p>
             {emp.map((e) => {
-              const acc = feriasAcumuladas(new Date(e.hire_date));
+              const acc = feriasAcumuladas(new Date(e.hire_date),new Date(),e.contract_type);
               const used = (data?.va ?? []).filter((v) => v.employee_id === e.id).reduce((a, v) => a + v.days, 0);
               return (
                 <form key={e.id} className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2 text-sm" onSubmit={async (ev) => {
@@ -130,12 +134,12 @@ function RH() {
               ev.preventDefault(); const f = ev.currentTarget; const g = (k: string) => (f.elements.namedItem(k) as HTMLInputElement);
               try {
                 const proof = await uploadProof(g("file").files?.[0], "faltas");
-                const { error } = await supabase.from("absences").insert({ employee_id: g("emp").value, absence_date: g("date").value, reason: g("reason").value, proof_path: proof });
+                const { error } = await supabase.from("absences").insert({ employee_id: g("emp").value, absence_date: g("date").value.slice(0,10), occurred_at:new Date(g("date").value).toISOString(), reason: g("reason").value, proof_path: proof });
                 if (error) throw error; f.reset(); refresh(); toast.success("Falta registada");
               } catch (e: any) { toast.error(e.message); }
             }}>
               <select name="emp" required className="rounded-md border bg-background px-2 text-sm"><option value="">Funcionário</option>{emp.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}</select>
-              <Input name="date" type="date" required className="max-w-[160px]" />
+              <Input name="date" aria-label="Data e hora da falta" type="datetime-local" required className="max-w-[230px]" />
               <Input name="reason" placeholder="Motivo" required className="max-w-xs" />
               <Input name="file" type="file" accept="image/*,application/pdf" className="max-w-[240px]" />
               <Button>Registar</Button>
@@ -146,8 +150,9 @@ function RH() {
                 <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm">
                   <span>{name(a.employee_id)} · {a.absence_date} · {a.reason}</span>
                   <span className="flex items-center gap-2">
-                    {a.proof_path && <button className="text-primary hover:underline" onClick={() => openProof(a.proof_path!)}>Comprovativo</button>}
-                    <Badge className={ok ? "bg-success text-primary-foreground" : "bg-destructive text-destructive-foreground"}>{ok ? "Justificada" : "Injustificada"}</Badge>
+                    {a.proof_path && <Button size="sm" variant="link" onClick={() => {if(a.proof_path)openProof(a.proof_path);}}>Comprovativo</Button>}
+                    <Badge variant="outline">{a.decision==="aprovada"?"Justificada":a.submitted_at?`Justificação ${a.decision}`:"Sem aprovação"}</Badge>
+                    {a.submitted_at&&a.decision==="pendente"&&(["aprovada","rejeitada"] as const).map(d=><Button key={d} size="sm" variant="outline" onClick={async()=>{const {error}=await supabase.rpc("decide_absence",{_absence:a.id,_decision:d});if(error)return toast.error(error.message);refresh();}}>{d==="aprovada"?"Aprovar":"Rejeitar"}</Button>)}
                   </span>
                 </div>
               );
@@ -155,6 +160,7 @@ function RH() {
           </CardContent></Card>
         </TabsContent>
       </Tabs>
+      <section className="mt-6 border-t pt-4"><h2 className="mb-3 text-lg">Pedidos dos colaboradores</h2>{data?.requests.map(r=><div key={r.id} className="mb-2 flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm"><span>{name(r.employee_id)} · {r.kind} · {r.details} · {r.status}</span>{r.status==="pendente"&&<span className="flex gap-2">{["aprovado","rejeitado"].map(status=><Button key={status} size="sm" variant="outline" onClick={async()=>{const {error}=await supabase.rpc("decide_employee_request",{_id:r.id,_status:status});if(error)return toast.error(error.message);refresh();}}>{status==="aprovado"?"Aprovar":"Rejeitar"}</Button>)}</span>}</div>)}</section>
     </>
   );
 }
