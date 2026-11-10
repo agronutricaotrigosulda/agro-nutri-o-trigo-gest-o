@@ -36,6 +36,13 @@
       "when": 1794200631929,
       "tag": "0004_atomic_access_payroll_and_votes",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794291313836,
+      "tag": "0005_workspace_configuration",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,18 @@
+CREATE TABLE public.workspace_config(id integer PRIMARY KEY DEFAULT 1 CHECK(id=1),spreadsheet_id text,root_folder_id text,last_synced_at timestamptz);
+GRANT SELECT ON public.workspace_config TO authenticated; GRANT ALL ON public.workspace_config TO service_role;
+ALTER TABLE public.workspace_config ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "workspace partner read" ON public.workspace_config FOR SELECT TO authenticated USING(public.is_partner(auth.uid()));
+ALTER TABLE public.projects ADD COLUMN sheet_range text;
+ALTER TABLE public.employees ADD COLUMN drive_folder_id text;
+CREATE TABLE public.sector_plans(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),area text NOT NULL,title text NOT NULL,budget numeric NOT NULL DEFAULT 0,strategy text,created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT,INSERT,UPDATE,DELETE ON public.sector_plans TO authenticated; GRANT ALL ON public.sector_plans TO service_role;
+ALTER TABLE public.sector_plans ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "sector plans scoped" ON public.sector_plans FOR ALL TO authenticated USING(public.is_partner(auth.uid()) OR (public.access_level_for(auth.uid())='marketing' AND area=(SELECT a.area FROM public.user_access a WHERE a.user_id=auth.uid()))) WITH CHECK(public.is_partner(auth.uid()) OR (public.access_level_for(auth.uid())='marketing' AND area=(SELECT a.area FROM public.user_access a WHERE a.user_id=auth.uid())));
+CREATE TABLE public.suggestions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),area text NOT NULL,title text NOT NULL,details text,created_by uuid NOT NULL DEFAULT auth.uid(),status text NOT NULL DEFAULT 'pendente',created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT,INSERT,UPDATE ON public.suggestions TO authenticated; GRANT ALL ON public.suggestions TO service_role;
+ALTER TABLE public.suggestions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "suggestions own read" ON public.suggestions FOR SELECT TO authenticated USING(created_by=auth.uid() OR public.is_partner(auth.uid()) OR (public.access_level_for(auth.uid())='marketing' AND area=(SELECT a.area FROM public.user_access a WHERE a.user_id=auth.uid())));
+CREATE POLICY "suggestions submit" ON public.suggestions FOR INSERT TO authenticated WITH CHECK(created_by=auth.uid() AND status='pendente' AND public.access_level_for(auth.uid())<>'restrito');
+CREATE POLICY "suggestions moderate" ON public.suggestions FOR UPDATE TO authenticated USING(public.is_partner(auth.uid()) OR (public.access_level_for(auth.uid())='marketing' AND area=(SELECT a.area FROM public.user_access a WHERE a.user_id=auth.uid()))) WITH CHECK(public.is_partner(auth.uid()) OR (public.access_level_for(auth.uid())='marketing' AND area=(SELECT a.area FROM public.user_access a WHERE a.user_id=auth.uid())));
+CREATE FUNCTION public.check_request_fields() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN IF NEW.kind='ferias' AND (NEW.start_date IS NULL OR NEW.days IS NULL OR NEW.days<=0 OR NEW.days<>trunc(NEW.days)) THEN RAISE EXCEPTION 'Férias exigem data e dias inteiros positivos'; END IF; RETURN NEW; END $$;
+CREATE TRIGGER request_fields BEFORE INSERT ON public.employee_requests FOR EACH ROW EXECUTE FUNCTION public.check_request_fields();

@@ -33,6 +33,7 @@ const ITEMS: Item[] = [
   { to: "/rh", label: "Recursos Humanos", icon: Users, show: (m) => m.canHR },
   { to: "/projetos", label: "Projetos e Tarefas", icon: FolderKanban, show: (m) => m.access?.status==="ativo" },
   { to: "/utilizadores", label: "Utilizadores", icon: UserCog, show: (m) => m.canManageUsers },
+  { to: "/workspace", label: "Google Workspace", icon: FolderKanban, show: (m) => m.isSocio },
 ];
 
 function Nav() {

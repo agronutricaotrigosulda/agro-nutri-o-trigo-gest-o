@@ -347,6 +347,7 @@ export type Database = {
           doc_number: string
           doc_path: string | null
           doc_type: string
+          drive_folder_id: string | null
           email: string | null
           full_name: string
           gender: string | null
@@ -369,6 +370,7 @@ export type Database = {
           doc_number: string
           doc_path?: string | null
           doc_type?: string
+          drive_folder_id?: string | null
           email?: string | null
           full_name: string
           gender?: string | null
@@ -391,6 +393,7 @@ export type Database = {
           doc_number?: string
           doc_path?: string | null
           doc_type?: string
+          drive_folder_id?: string | null
           email?: string | null
           full_name?: string
           gender?: string | null
@@ -614,6 +617,7 @@ export type Database = {
           investment: number
           name: string
           revenue: number
+          sheet_range: string | null
           submitted_at: string
           submitted_by: string | null
           uses_company_resources: boolean
@@ -627,6 +631,7 @@ export type Database = {
           investment?: number
           name: string
           revenue?: number
+          sheet_range?: string | null
           submitted_at?: string
           submitted_by?: string | null
           uses_company_resources?: boolean
@@ -640,6 +645,7 @@ export type Database = {
           investment?: number
           name?: string
           revenue?: number
+          sheet_range?: string | null
           submitted_at?: string
           submitted_by?: string | null
           uses_company_resources?: boolean
@@ -768,6 +774,33 @@ export type Database = {
           },
         ]
       }
+      sector_plans: {
+        Row: {
+          area: string
+          budget: number
+          created_at: string
+          id: string
+          strategy: string | null
+          title: string
+        }
+        Insert: {
+          area: string
+          budget?: number
+          created_at?: string
+          id?: string
+          strategy?: string | null
+          title: string
+        }
+        Update: {
+          area?: string
+          budget?: number
+          created_at?: string
+          id?: string
+          strategy?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       shareholders: {
         Row: {
           capital_pct: number
@@ -834,6 +867,36 @@ export type Database = {
           kind?: string
           name?: string
           target?: number
+        }
+        Relationships: []
+      }
+      suggestions: {
+        Row: {
+          area: string
+          created_at: string
+          created_by: string
+          details: string | null
+          id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          status?: string
+          title?: string
         }
         Relationships: []
       }
@@ -969,6 +1032,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      workspace_config: {
+        Row: {
+          id: number
+          last_synced_at: string | null
+          root_folder_id: string | null
+          spreadsheet_id: string | null
+        }
+        Insert: {
+          id?: number
+          last_synced_at?: string | null
+          root_folder_id?: string | null
+          spreadsheet_id?: string | null
+        }
+        Update: {
+          id?: number
+          last_synced_at?: string | null
+          root_folder_id?: string | null
+          spreadsheet_id?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
