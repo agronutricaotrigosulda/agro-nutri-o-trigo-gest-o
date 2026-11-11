@@ -48,7 +48,7 @@ function Gov() {
     refresh();
   }
   async function decide(id: string, status: "aprovado" | "rejeitado") {
-    await supabase.from("approvals").update({ status }).eq("id", id); refresh();
+    const {error}=await supabase.rpc("decide_approval",{_id:id,_status:status});if(error)return toast.error(error.message);refresh();
   }
   const canDecide = (level: string) =>
     level === "diretor" ? me?.isGestao : level === "gerente" ? me?.roles.includes("gerente") || me?.isSocio : me?.isSocio;
