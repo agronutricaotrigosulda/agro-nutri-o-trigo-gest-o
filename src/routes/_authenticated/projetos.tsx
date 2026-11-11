@@ -15,7 +15,7 @@ import { tarefaUrgente } from "@/lib/rules";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/projetos")({
-  head: () => ({ meta: [{ title: "Projetos e Tarefas — Agro-Nutrição Trigo" }, { name: "description", content: "Balanço de projetos e tarefas com prazos." }, { property: "og:title", content: "Projetos — Agro-Nutrição Trigo" }, { property: "og:description", content: "Projetos e tarefas." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Projetos e Tarefas — Agro-Nutrição Trigo" }, { name: "description", content: "Balanço de projetos e tarefas com prazos." }, { property: "og:title", content: "Projetos — Agro-Nutrição Trigo" }, { property: "og:description", content: "Projetos e tarefas." }] }),
   component: Projetos,
 });
 

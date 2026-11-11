@@ -15,7 +15,7 @@ import { deliberacao, nivelAprovacao } from "@/lib/rules";
 import { ShareholderForm } from "@/components/shareholder-form";
 
 export const Route = createFileRoute("/_authenticated/governacao")({
-  head: () => ({ meta: [{ title: "Governação — Agro-Nutrição Trigo" }, { name: "description", content: "Sócios, deliberações e aprovações." }, { property: "og:title", content: "Governação — Agro-Nutrição Trigo" }, { property: "og:description", content: "Governação societária." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Governação — Agro-Nutrição Trigo" }, { name: "description", content: "Sócios, deliberações e aprovações." }, { property: "og:title", content: "Governação — Agro-Nutrição Trigo" }, { property: "og:description", content: "Governação societária." }] }),
   component: Gov,
 });
 

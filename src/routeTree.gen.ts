@@ -17,6 +17,7 @@ import { Route as AuthenticatedColaboradorRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDividasRouteImport } from './routes/_authenticated/dividas'
 import { Route as AuthenticatedFinancasRouteImport } from './routes/_authenticated/financas'
 import { Route as AuthenticatedGovernacaoRouteImport } from './routes/_authenticated/governacao'
+import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
@@ -64,6 +65,11 @@ const AuthenticatedFinancasRoute = AuthenticatedFinancasRouteImport.update({
 const AuthenticatedGovernacaoRoute = AuthenticatedGovernacaoRouteImport.update({
   id: '/governacao',
   path: '/governacao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
+  '/marketing': typeof AuthenticatedMarketingRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
+  '/marketing': typeof AuthenticatedMarketingRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/dividas': typeof AuthenticatedDividasRoute
   '/_authenticated/financas': typeof AuthenticatedFinancasRoute
   '/_authenticated/governacao': typeof AuthenticatedGovernacaoRoute
+  '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/dividas'
     | '/financas'
     | '/governacao'
+    | '/marketing'
     | '/painel'
     | '/pedidos'
     | '/produtos'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/dividas'
     | '/financas'
     | '/governacao'
+    | '/marketing'
     | '/painel'
     | '/pedidos'
     | '/produtos'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dividas'
     | '/_authenticated/financas'
     | '/_authenticated/governacao'
+    | '/_authenticated/marketing'
     | '/_authenticated/painel'
     | '/_authenticated/pedidos'
     | '/_authenticated/produtos'
@@ -281,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGovernacaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/marketing': {
+      id: '/_authenticated/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -345,6 +364,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDividasRoute: typeof AuthenticatedDividasRoute
   AuthenticatedFinancasRoute: typeof AuthenticatedFinancasRoute
   AuthenticatedGovernacaoRoute: typeof AuthenticatedGovernacaoRoute
+  AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
@@ -360,6 +380,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDividasRoute: AuthenticatedDividasRoute,
   AuthenticatedFinancasRoute: AuthenticatedFinancasRoute,
   AuthenticatedGovernacaoRoute: AuthenticatedGovernacaoRoute,
+  AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,

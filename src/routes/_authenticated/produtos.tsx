@@ -12,7 +12,7 @@ import { NoAccess, PageTitle } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 
 export const Route = createFileRoute("/_authenticated/produtos")({
-  head: () => ({ meta: [{ title: "Preços e Produtos — Agro-Nutrição Trigo" }, { name: "description", content: "Tabela de preços e tetos de desconto." }, { property: "og:title", content: "Preços — Agro-Nutrição Trigo" }, { property: "og:description", content: "Tabela de preços." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Preços e Produtos — Agro-Nutrição Trigo" }, { name: "description", content: "Tabela de preços e tetos de desconto." }, { property: "og:title", content: "Preços — Agro-Nutrição Trigo" }, { property: "og:description", content: "Tabela de preços." }] }),
   component: Produtos,
 });
 

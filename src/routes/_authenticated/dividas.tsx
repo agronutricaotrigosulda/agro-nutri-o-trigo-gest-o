@@ -13,7 +13,7 @@ import { NoAccess, PageTitle, openProof, uploadProof } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 
 export const Route = createFileRoute("/_authenticated/dividas")({
-  head: () => ({ meta: [{ title: "Dívidas — Agro-Nutrição Trigo" }, { name: "description", content: "Quem a empresa deve e quem nos deve." }, { property: "og:title", content: "Dívidas — Agro-Nutrição Trigo" }, { property: "og:description", content: "Gestão de dívidas." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Dívidas — Agro-Nutrição Trigo" }, { name: "description", content: "Quem a empresa deve e quem nos deve." }, { property: "og:title", content: "Dívidas — Agro-Nutrição Trigo" }, { property: "og:description", content: "Gestão de dívidas." }] }),
   component: Dividas,
 });
 

@@ -18,7 +18,7 @@ import { validarVenda } from "@/lib/rules";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/vendas")({
-  head: () => ({ meta: [{ title: "Vendas — Agro-Nutrição Trigo" }, { name: "description", content: "Terminal de vendas." }, { property: "og:title", content: "Vendas — Agro-Nutrição Trigo" }, { property: "og:description", content: "Terminal de vendas." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Vendas — Agro-Nutrição Trigo" }, { name: "description", content: "Terminal de vendas." }, { property: "og:title", content: "Vendas — Agro-Nutrição Trigo" }, { property: "og:description", content: "Terminal de vendas." }] }),
   component: Vendas,
 });
 
