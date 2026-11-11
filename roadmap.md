@@ -1,9 +1,17 @@
 # Roadmap
-- [ ] Reformulação integral: seis perfis, vendas por autorização, sigilo por área e portal do colaborador — escopo preparado
-- [ ] Reformulação RH: documentos, efetividade, folha/IRPS, férias, recibos e rescisões — tabela mensal oficial e enquadramento legal pendentes
-- [ ] Reformulação financeira: pagamentos com comprovativo, reservas, quotas e bónus de projetos
-- [ ] Reformulação de tarefas/projetos e central Google Workspace — requer autorização da conta central
+- [x] Seis perfis, vendas por autorização individual, sigilo societário, cargos e convites seguros
+- [x] Portal do colaborador, faltas com 48h e transição no dia 10, documentos, pedidos e férias mensais
+- [x] Rascunhos salariais, INSS e operações protegidas de assinatura/pagamento; emissão definitiva bloqueada sem IRPS validado
+- [x] Painel executivo, lançamentos com comprovativo, reservas e quotas com operações protegidas
+- [x] Tarefas segmentadas, edição/adiamento/exclusão e área de Marketing
+- [x] Drive, Sheets e Gmail ligados; conta central do Drive verificada; página de configuração e sincronização manual de projetos
+- [ ] IRPS definitivo, 13.º mês e rescisões — requer tabela oficial mensal e enquadramento contratual/fiscal
+- [ ] Cadastro atual: associar contas aos funcionários/sócios, áreas, contactos reais e capital investido histórico — requer dados da empresa
+- [ ] Planilha geral: definir/criar a planilha e intervalos de projetos — requer escolha dos dados reais para sincronização
+- [ ] Completar exportação protegida de recibos, pastas privadas individuais, relatórios mensais/anuais e avisos automáticos por e-mail
+- [ ] Completar promoções/abonos/remuneração, pagamentos de pedidos, dívidas em mercadorias e liquidação de bónus dos projetos
+- [ ] Testar ciclo completo com contas de cada perfil e dados salariais válidos; apenas navegação autenticada e preparação de rascunho verificadas até agora
 - [x] Base, identidade, perfis, convites por e-mail, PWA
 - [x] Vendas, preços, finanças, dívidas, governação, RH, projetos/tarefas
-- [ ] Ligação ao Google Sheets (faturamento/saídas/lucro) — aguarda ligação da conta Google e link da planilha
+- [x] Ligação ao Google Sheets e sincronização em lote de faturamento/saídas/lucro implementadas
 - [ ] E-mails com o domínio próprio da empresa — aguarda domínio
