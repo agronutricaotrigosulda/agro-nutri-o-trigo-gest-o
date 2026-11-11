@@ -12,6 +12,7 @@ import { Money } from "@/lib/format";
 import { NoAccess, PageTitle } from "@/components/page";
 import { useMe } from "@/lib/use-roles";
 import { deliberacao, nivelAprovacao } from "@/lib/rules";
+import { ShareholderForm } from "@/components/shareholder-form";
 
 export const Route = createFileRoute("/_authenticated/governacao")({
   head: () => ({ meta: [{ title: "Governação — Agro-Nutrição Trigo" }, { name: "description", content: "Sócios, deliberações e aprovações." }, { property: "og:title", content: "Governação — Agro-Nutrição Trigo" }, { property: "og:description", content: "Governação societária." }] }),
@@ -65,7 +66,7 @@ function Gov() {
                 <span>{s.name} {s.founder && <Badge className="ml-1 bg-secondary text-secondary-foreground">Fundador · veto</Badge>}</span><span className="font-semibold">{Number(s.capital_pct)}%</span>
               </div>
             ))}
-            {me?.isDirecao && (
+            {false && me?.isDirecao && (
               <div className="flex flex-wrap items-center gap-2 border-t pt-3">
                 <Input placeholder="Nome" value={sh.name} onChange={(e) => setSh({ ...sh, name: e.target.value })} className="max-w-[180px]" />
                 <Input placeholder="% capital" type="number" value={sh.capital_pct} onChange={(e) => setSh({ ...sh, capital_pct: e.target.value })} className="max-w-[110px]" />
@@ -77,6 +78,7 @@ function Gov() {
                 }}>Adicionar</Button>
               </div>
             )}
+            <ShareholderForm shareholders={shs} refresh={refresh}/>
           </CardContent>
         </Card>
         <Card>

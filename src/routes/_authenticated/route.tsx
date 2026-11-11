@@ -35,6 +35,7 @@ const ITEMS: Item[] = [
   { to: "/utilizadores", label: "Utilizadores", icon: UserCog, show: (m) => m.canManageUsers },
   { to: "/workspace", label: "Google Workspace", icon: FolderKanban, show: (m) => m.isSocio },
   { to: "/pedidos", label: "Pedidos e Aprovações", icon: HandCoins, show: () => true },
+  { to: "/marketing", label: "Marketing Digital", icon: FolderKanban, show: m => m.canMarketing },
 ];
 
 function Nav() {

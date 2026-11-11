@@ -1,0 +1,13 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {useQuery,useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {supabase} from "@/integrations/supabase/client";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Money} from "@/lib/format";
+import {useMe} from "@/lib/use-roles";
+import {PageTitle,NoAccess} from "@/components/page";
+import {appHead} from "@/lib/metadata";
+export const Route=createFileRoute("/_authenticated/marketing")({head:()=>appHead("Marketing Digital","Planos estratégicos, orçamento setorial e sugestões."),component:Marketing});
+function Marketing(){const {data:me}=useMe();const qc=useQueryClient();const {data}=useQuery({queryKey:["marketing"],queryFn:async()=>{const [p,s]=await Promise.all([supabase.from("sector_plans").select("*"),supabase.from("suggestions").select("*")]);if(p.error)throw p.error;if(s.error)throw s.error;return {p:p.data,s:s.data};}});if(me&&!me.canMarketing)return <NoAccess/>;return <><PageTitle title="Marketing Digital"/><form className="grid gap-3 border-b pb-6 sm:grid-cols-3" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);const {error}=await supabase.from("sector_plans").insert({title:String(f.get("title")),area:me?.access?.area??"marketing",budget:Number(f.get("budget")),strategy:String(f.get("strategy"))});if(error)return toast.error(error.message);form.reset();qc.invalidateQueries();}}><Input name="title" placeholder="Plano estratégico" required/><Input name="budget" placeholder="Orçamento setorial" type="number" min="0" required/><Textarea name="strategy" placeholder="Estratégia" required/><Button>Criar plano</Button></form><div className="my-5 grid gap-3 sm:grid-cols-3">{data?.p.map(p=><div key={p.id} className="rounded-lg border bg-card p-4"><h2>{p.title}</h2><p className="my-2 text-sm">{p.strategy}</p><Money value={p.budget}/></div>)}</div><h2 className="mb-3 text-xl">Moderação de sugestões</h2>{data?.s.map(s=><div key={s.id} className="mb-3 rounded-lg border p-3"><h3>{s.title}</h3><p className="text-sm">{s.details} · {s.status}</p>{s.status==="pendente"&&<div className="mt-2 flex gap-2">{["aprovada","rejeitada"].map(status=><Button key={status} size="sm" variant="outline" onClick={async()=>{const {error}=await supabase.from("suggestions").update({status}).eq("id",s.id);if(error)return toast.error(error.message);qc.invalidateQueries();}}>{status==="aprovada"?"Aprovar":"Rejeitar"}</Button>)}</div>}</div>)}</>}
