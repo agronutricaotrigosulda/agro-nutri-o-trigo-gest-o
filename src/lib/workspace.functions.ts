@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 async function gateway(path:string,key:string,method="GET",body?:unknown){
  const api=process.env['LOVABLE_API_KEY']; if(!api||!key)throw new Error("Ligação Google indisponível");
- const response=await fetch(`https://connector-gateway.lovable.dev/${path}`,{method,headers:{Authorization:`Bearer ${api}`,"X-Connection-Api-Key":key,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+ const response=await fetch(`https://connector-gateway.lovable.dev/${path}`,{method,headers:{Authorization:`Bearer ${api}`,"X-Connection-Api-Key":key,"Content-Type":"application/json"},body:body?JSON.stringify(body):null});
  if(!response.ok){const text=await response.text();console.error(`Google [${response.status}]: ${text}`);throw new Error(`Google [${response.status}]: ${text}`);}return response.json();
 }
 export const configureWorkspace=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator(d=>z.object({spreadsheetId:z.string().regex(/^[a-zA-Z0-9_-]+$/).optional()}).parse(d)).handler(async({data,context})=>{

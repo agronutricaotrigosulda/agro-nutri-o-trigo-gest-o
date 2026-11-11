@@ -55,7 +55,7 @@ function Projetos() {
               <Input placeholder="Receitas" type="number" value={np.revenue} onChange={(e) => setNp({ ...np, revenue: e.target.value })} className="max-w-[140px]" />
               <Input placeholder="Despesas" type="number" value={np.expenses} onChange={(e) => setNp({ ...np, expenses: e.target.value })} className="max-w-[140px]" />
               <Input placeholder="Investimento" type="number" value={np.investment} onChange={e=>setNp({...np,investment:e.target.value})} className="max-w-[140px]"/>
-              <Button onClick={async () => { if (!np.name) return; const { error } = await supabase.from("projects").insert({ name: np.name, revenue: Number(np.revenue), expenses: Number(np.expenses),investment:Number(np.investment),area:me?.access?.area }); if (error) return toast.error(error.message); setNp({ name: "", revenue: "", expenses: "",investment:"" }); refresh(); }}>Adicionar</Button>
+              <Button onClick={async () => { if (!np.name) return; const { error } = await supabase.from("projects").insert({ name: np.name, revenue: Number(np.revenue), expenses: Number(np.expenses),investment:Number(np.investment),area:me?.access?.area??null }); if (error) return toast.error(error.message); setNp({ name: "", revenue: "", expenses: "",investment:"" }); refresh(); }}>Adicionar</Button>
             </div>
           </CardContent>
         </Card>
@@ -74,7 +74,7 @@ function Projetos() {
               <select className="rounded-md border bg-background px-2 text-sm" value={nt.project_id} onChange={(e) => setNt({ ...nt, project_id: e.target.value })}>
                 <option value="">Sem projeto</option>{(data?.p ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
-              <Button onClick={async () => { if (!nt.title) return; const {error}=await supabase.from("tasks").insert({ ...nt, project_id: nt.project_id || null, due_date: nt.due_date || null,assigned_user_id:nt.assigned_user_id||null,area:nt.area||me?.access?.area });if(error)return toast.error(error.message);setNt({ title: "", due_date: "", project_id: "", assignee: "",scope:"geral",area:"",assigned_user_id:"" }); refresh(); }}>Adicionar</Button>
+              <Button onClick={async () => { if (!nt.title) return; const {error}=await supabase.from("tasks").insert({ ...nt, project_id: nt.project_id || null, due_date: nt.due_date || null,assigned_user_id:nt.assigned_user_id||null,area:nt.area||me?.access?.area||null });if(error)return toast.error(error.message);setNt({ title: "", due_date: "", project_id: "", assignee: "",scope:"geral",area:"",assigned_user_id:"" }); refresh(); }}>Adicionar</Button>
             </div>
           )}
           {(data?.t ?? []).map((t) => {
