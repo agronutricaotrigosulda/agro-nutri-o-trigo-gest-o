@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
       { title: "Agro-Nutrição Trigo — Gestão da Empresa" },
       { name: "description", content: "Sistema de gestão da Agro-Nutrição Trigo: vendas, finanças em Meticais, RH, governação e projetos." },
       { property: "og:title", content: "Agro-Nutrição Trigo — Gestão da Empresa" },

@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
-    meta: [
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
       { title: "Entrar — Agro-Nutrição Trigo" },
       { name: "description", content: "Acesso ao sistema de gestão da Agro-Nutrição Trigo." },
       { property: "og:title", content: "Entrar — Agro-Nutrição Trigo" },

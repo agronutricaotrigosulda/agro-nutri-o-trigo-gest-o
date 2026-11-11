@@ -17,7 +17,9 @@ import { Route as AuthenticatedColaboradorRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDividasRouteImport } from './routes/_authenticated/dividas'
 import { Route as AuthenticatedFinancasRouteImport } from './routes/_authenticated/financas'
 import { Route as AuthenticatedGovernacaoRouteImport } from './routes/_authenticated/governacao'
+import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedRhRouteImport } from './routes/_authenticated/rh'
@@ -65,9 +67,19 @@ const AuthenticatedGovernacaoRoute = AuthenticatedGovernacaoRouteImport.update({
   path: '/governacao',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
@@ -110,7 +122,9 @@ export interface FileRoutesByFullPath {
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
+  '/marketing': typeof AuthenticatedMarketingRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/pedidos': typeof AuthenticatedPedidosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/projetos': typeof AuthenticatedProjetosRoute
   '/rh': typeof AuthenticatedRhRoute
@@ -126,7 +140,9 @@ export interface FileRoutesByTo {
   '/dividas': typeof AuthenticatedDividasRoute
   '/financas': typeof AuthenticatedFinancasRoute
   '/governacao': typeof AuthenticatedGovernacaoRoute
+  '/marketing': typeof AuthenticatedMarketingRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/pedidos': typeof AuthenticatedPedidosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/projetos': typeof AuthenticatedProjetosRoute
   '/rh': typeof AuthenticatedRhRoute
@@ -144,7 +160,9 @@ export interface FileRoutesById {
   '/_authenticated/dividas': typeof AuthenticatedDividasRoute
   '/_authenticated/financas': typeof AuthenticatedFinancasRoute
   '/_authenticated/governacao': typeof AuthenticatedGovernacaoRoute
+  '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
   '/_authenticated/rh': typeof AuthenticatedRhRoute
@@ -162,7 +180,9 @@ export interface FileRouteTypes {
     | '/dividas'
     | '/financas'
     | '/governacao'
+    | '/marketing'
     | '/painel'
+    | '/pedidos'
     | '/produtos'
     | '/projetos'
     | '/rh'
@@ -178,7 +198,9 @@ export interface FileRouteTypes {
     | '/dividas'
     | '/financas'
     | '/governacao'
+    | '/marketing'
     | '/painel'
+    | '/pedidos'
     | '/produtos'
     | '/projetos'
     | '/rh'
@@ -195,7 +217,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dividas'
     | '/_authenticated/financas'
     | '/_authenticated/governacao'
+    | '/_authenticated/marketing'
     | '/_authenticated/painel'
+    | '/_authenticated/pedidos'
     | '/_authenticated/produtos'
     | '/_authenticated/projetos'
     | '/_authenticated/rh'
@@ -269,11 +293,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGovernacaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/marketing': {
+      id: '/_authenticated/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pedidos': {
+      id: '/_authenticated/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof AuthenticatedPedidosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/produtos': {
@@ -326,7 +364,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDividasRoute: typeof AuthenticatedDividasRoute
   AuthenticatedFinancasRoute: typeof AuthenticatedFinancasRoute
   AuthenticatedGovernacaoRoute: typeof AuthenticatedGovernacaoRoute
+  AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRoute
   AuthenticatedRhRoute: typeof AuthenticatedRhRoute
@@ -340,7 +380,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDividasRoute: AuthenticatedDividasRoute,
   AuthenticatedFinancasRoute: AuthenticatedFinancasRoute,
   AuthenticatedGovernacaoRoute: AuthenticatedGovernacaoRoute,
+  AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedProjetosRoute: AuthenticatedProjetosRoute,
   AuthenticatedRhRoute: AuthenticatedRhRoute,

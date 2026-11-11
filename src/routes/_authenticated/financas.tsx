@@ -17,7 +17,7 @@ import { CashLedger } from "@/components/cash-ledger";
 import { Reserves } from "@/components/reserves";
 
 export const Route = createFileRoute("/_authenticated/financas")({
-  head: () => ({ meta: [{ title: "Finanças — Agro-Nutrição Trigo" }, { name: "description", content: "Orçamento anual e reservas estatutárias." }, { property: "og:title", content: "Finanças — Agro-Nutrição Trigo" }, { property: "og:description", content: "Orçamento e reservas." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Finanças — Agro-Nutrição Trigo" }, { name: "description", content: "Orçamento anual e reservas estatutárias." }, { property: "og:title", content: "Finanças — Agro-Nutrição Trigo" }, { property: "og:description", content: "Orçamento e reservas." }] }),
   component: Financas,
 });
 

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { permissaoVendas } from "@/lib/rules";
 
 export type Role = "socio_fundador" | "socio" | "gerente" | "diretor" | "funcionario" | "vendedor";
 
@@ -22,7 +23,7 @@ export function useMe() {
         roles,
         access,
         isGestao: partner || manager,
-        canSell: partner || manager || (active && level === "funcionario" && access.sales_enabled),
+        canSell: permissaoVendas(level,access?.sales_enabled??false,access?.status),
         isDirecao: partner || manager,
         isSocio: partner,
         canHR: partner || (active && level === "rh"),

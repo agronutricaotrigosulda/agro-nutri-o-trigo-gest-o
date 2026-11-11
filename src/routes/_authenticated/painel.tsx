@@ -1,70 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Money } from "@/lib/format";
-import { PageTitle } from "@/components/page";
-import { useMe } from "@/lib/use-roles";
-import { tarefaUrgente } from "@/lib/rules";
-
-export const Route = createFileRoute("/_authenticated/painel")({
-  head: () => ({ meta: [{ title: "Painel — Agro-Nutrição Trigo" }, { name: "description", content: "Resumo da empresa." }, { property: "og:title", content: "Painel — Agro-Nutrição Trigo" }, { property: "og:description", content: "Resumo da empresa." }] }),
-  component: Painel,
-});
-
-function Painel() {
-  const { data: me } = useMe();
-  const { data } = useQuery({
-    queryKey: ["painel"],
-    queryFn: async () => {
-      const today = new Date().toISOString().slice(0, 10);
-      const [sales, debts, tasks] = await Promise.all([
-        supabase.from("sales").select("total, created_at").gte("created_at", today),
-        supabase.from("debts").select("direction, amount, debt_payments(amount)"),
-        supabase.from("tasks").select("id, title, due_date, done").eq("done", false).order("due_date"),
-      ]);
-      const saldo = (dir: string) => (debts.data ?? []).filter((d) => d.direction === dir)
-        .reduce((s, d: any) => s + Number(d.amount) - (d.debt_payments ?? []).reduce((a: number, p: any) => a + Number(p.amount), 0), 0);
-      return {
-        vendasHoje: (sales.data ?? []).reduce((s, x) => s + Number(x.total), 0),
-        nVendas: sales.data?.length ?? 0,
-        pagar: saldo("pagar"), receber: saldo("receber"),
-        tasks: tasks.data ?? [],
-      };
-    },
-  });
-  const urgentes = (data?.tasks ?? []).filter((t) => tarefaUrgente(t.due_date, t.done));
-  return (
-    <>
-      <PageTitle title="Painel" subtitle={`Bem-vindo(a), ${me?.user.user_metadata?.['full_name'] ?? me?.user.email ?? ""}`} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Vendas de hoje" value={<Money value={data?.vendasHoje} />} hint={`${data?.nVendas ?? 0} vendas`} />
-        {me?.isGestao && <Stat label="Quem nos deve" value={<Money value={data?.receber} />} />}
-        {me?.isGestao && <Stat label="Quem a empresa deve" value={<Money value={data?.pagar} />} />}
-        <Stat label="Tarefas urgentes" value={<span className={urgentes.length ? "text-destructive" : ""}>{urgentes.length}</span>} />
-      </div>
-      <Card className="mt-6">
-        <CardHeader><CardTitle className="text-lg">Tarefas próximas do prazo</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          {urgentes.length === 0 && <p className="text-sm text-muted-foreground">Sem tarefas urgentes.</p>}
-          {urgentes.map((t) => (
-            <div key={t.id} className="flex justify-between rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
-              <span>{t.title}</span><span className="font-semibold text-destructive">{t.due_date}</span>
-            </div>
-          ))}
-          <Link to="/projetos" className="text-sm text-primary hover:underline">Ver todas as tarefas</Link>
-        </CardContent>
-      </Card>
-    </>
-  );
-}
-
-function Stat({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
-  return (
-    <Card><CardContent className="pt-5">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="mt-1 text-2xl font-bold">{value}</div>
-      {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
-    </CardContent></Card>
-  );
+import {createFileRoute,Link} from '@tanstack/react-router';
+import {useQuery} from '@tanstack/react-query';
+import {supabase} from '@/integrations/supabase/client';
+import {Money} from '@/lib/format';
+import {PageTitle} from '@/components/page';
+import {UsefulContacts} from '@/components/contacts';
+import {useMe} from '@/lib/use-roles';
+import {tarefaUrgente,budgetAlert,distribuirLucro} from '@/lib/rules';
+import {appHead} from '@/lib/metadata';
+import {cn} from '@/lib/utils';
+import {BarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer,Legend} from 'recharts';
+export const Route=createFileRoute('/_authenticated/painel')({head:()=>appHead('Painel Executivo','Lucros, orçamento, projetos e pendências da empresa.'),component:Painel});
+function Painel(){const {data:me}=useMe();const {data}=useQuery({queryKey:['painel'],enabled:!!me,queryFn:async()=>{const year=new Date().getFullYear();const [s,p,b,t,c,pay,r,a,e]=await Promise.all([supabase.from('sales').select('total').gte('created_at',`${year}-01-01`),supabase.from('projects').select('*'),supabase.from('budgets').select('*').eq('year',year),supabase.from('tasks').select('*').eq('done',false),supabase.from('cash_movements').select('*').gte('created_at',`${year}-01-01`),supabase.from('payroll_runs').select('base,absence_deduction,inss_employer').gte('period',`${year}-01-01`),supabase.from('strategic_reserves').select('balance,confidential'),supabase.from('approvals').select('id,title,status').eq('status','pendente'),supabase.from('employees').select('id,full_name,doc_expires')]);return {s:s.data??[],p:p.data??[],b:b.data??[],t:t.data??[],c:c.data??[],pay:pay.data??[],r:r.data??[],a:a.data??[],e:e.data??[]};}});
+ const executive=me?.isGestao;const sales=(data?.s??[]).reduce((s,x)=>s+x.total,0);const projectRevenue=(data?.p??[]).reduce((s,x)=>s+x.revenue,0);const cashIn=(data?.c??[]).filter(x=>x.direction==='entrada'&&x.category!=='provisao').reduce((s,x)=>s+x.amount,0);const revenue=sales+projectRevenue+cashIn;
+ const projectExpenses=(data?.p??[]).reduce((s,x)=>s+x.expenses,0);const cashOut=(data?.c??[]).filter(x=>x.direction==='saida'&&x.category!=='provisao').reduce((s,x)=>s+x.amount,0);const wages=(data?.pay??[]).reduce((s,x)=>s+x.base-x.absence_deduction+x.inss_employer,0);const provisions=(data?.c??[]).filter(x=>x.category==='provisao').reduce((s,x)=>s+x.amount,0);const out=projectExpenses+cashOut+wages;const gross=revenue-projectExpenses;const net=revenue-out-provisions;const distribution=distribuirLucro(net);const reserves=(data?.r??[]).reduce((s,x)=>s+x.balance,0);const distributable=net<0?net:Math.max(0,distribution.socios-reserves);
+ const planned=(data?.b??[]).reduce((s,x)=>s+x.planned,0);const spent=(data?.b??[]).reduce((s,x)=>s+x.spent,0);const signal=budgetAlert(planned,spent);const urgent=(data?.t??[]).filter(t=>tarefaUrgente(t.due_date,t.done));
+ return <><PageTitle title={executive?'Painel Executivo':'Painel'} subtitle={me?.user.user_metadata?.['full_name']??''}/>{executive&&<><section className="mb-5 border-b pb-5"><p className="text-sm text-muted-foreground">{me?.isSocio?'Lucro divisível':'Lucro líquido operacional'}</p><Money value={me?.isSocio?distributable:net} className={cn('mt-2 block text-4xl font-semibold sm:text-5xl',(me?.isSocio?distributable:net)<0?'text-destructive':'text-success')}/>{!data?.pay.length&&<p className="mt-2 text-xs text-warning">Provisão salarial ainda sem folhas registadas.</p>}</section><div className="grid gap-x-6 gap-y-4 border-b pb-6 sm:grid-cols-2 lg:grid-cols-4">{[['Lucro bruto',gross],['Lucro líquido',net],['Faturamento',revenue],['Total de saídas',out],['Orçamento anual',planned],['Orçamento gasto',spent],['Saldo restante',planned-spent]].map(([label,value])=><div key={String(label)} className="min-w-0"><p className="text-xs text-muted-foreground">{label}</p><Money value={Number(value)} className={cn('block text-2xl font-semibold',label==='Saldo restante'&&(signal==='vermelho'?'text-destructive':signal==='amarelo'?'text-warning':'text-success'))}/></div>)}</div><section className="mt-6"><h2 className="mb-4 text-xl">Rendimento dos projetos</h2>{data?.p.length?<div className="h-72 w-full"><ResponsiveContainer><BarChart data={data.p.map(p=>({name:p.name,Entradas:p.revenue,Saídas:p.expenses}))}><XAxis dataKey="name"/><YAxis/><Tooltip formatter={v=>`${Number(v).toLocaleString('pt-MZ')} MT`}/><Legend/><Bar dataKey="Entradas" fill="var(--chart-1)"/><Bar dataKey="Saídas" fill="var(--chart-2)"/></BarChart></ResponsiveContainer></div>:<p className="text-sm text-muted-foreground">Sem projetos registados.</p>}</section></>}
+ <section className="mt-6 border-t pt-4"><h2 className="mb-3 text-xl">Central de notificações</h2>{urgent.map(t=><Link key={t.id} to="/projetos" className="mb-2 flex flex-wrap justify-between gap-2 border-l-4 border-destructive bg-destructive/10 p-3 text-sm"><span>{t.title}</span><span>{t.due_date}</span></Link>)}{data?.a.map(a=><Link key={a.id} to="/pedidos" className="mb-2 block border-l-4 border-warning bg-warning/10 p-3 text-sm">Aprovação pendente · {a.title}</Link>)}{me?.canHR&&data?.e.filter(e=>e.doc_expires&&new Date(e.doc_expires).getTime()-Date.now()<=10*86400000).map(e=><Link key={e.id} to="/rh" className="mb-2 block border-l-4 border-warning bg-warning/10 p-3 text-sm">Documento · {e.full_name} · {e.doc_expires}</Link>)}{!urgent.length&&!data?.a.length&&<p className="text-sm text-muted-foreground">Sem pendências de tarefas ou aprovações.</p>}</section>{!executive&&<UsefulContacts/>}</>;
 }

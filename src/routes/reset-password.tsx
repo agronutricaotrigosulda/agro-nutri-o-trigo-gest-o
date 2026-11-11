@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
-    meta: [
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
       { title: "Definir senha — Agro-Nutrição Trigo" },
       { name: "description", content: "Defina a sua senha de acesso ao sistema." },
       { property: "og:title", content: "Definir senha — Agro-Nutrição Trigo" },

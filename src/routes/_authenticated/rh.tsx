@@ -17,7 +17,7 @@ import { faixaDesempenho, faltaDentroDoPrazo, feriasAcumuladas, folhaSalarial } 
 import { Payroll } from "@/components/payroll";
 
 export const Route = createFileRoute("/_authenticated/rh")({
-  head: () => ({ meta: [{ title: "Recursos Humanos — Agro-Nutrição Trigo" }, { name: "description", content: "Funcionários, folha, férias, avaliações e faltas." }, { property: "og:title", content: "RH — Agro-Nutrição Trigo" }, { property: "og:description", content: "Recursos humanos." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },{ title: "Recursos Humanos — Agro-Nutrição Trigo" }, { name: "description", content: "Funcionários, folha, férias, avaliações e faltas." }, { property: "og:title", content: "RH — Agro-Nutrição Trigo" }, { property: "og:description", content: "Recursos humanos." }] }),
   component: RH,
 });
 

@@ -1,0 +1,12 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {useQuery,useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {supabase} from "@/integrations/supabase/client";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {PageTitle} from "@/components/page";
+import {Money} from "@/lib/format";
+import {useMe} from "@/lib/use-roles";
+import {appHead} from "@/lib/metadata";
+export const Route=createFileRoute("/_authenticated/pedidos")({head:()=>appHead("Pedidos e Aprovações","Pedidos individuais e decisões pela área competente."),component:Requests});
+function Requests(){const {data:me}=useMe();const qc=useQueryClient();const {data=[]}=useQuery({queryKey:["approvals"],queryFn:async()=>{const {data,error}=await supabase.from("approvals").select("*").order("created_at",{ascending:false});if(error)throw error;return data;}});return <><PageTitle title="Pedidos e Aprovações"/><form className="mb-5 flex flex-wrap gap-2" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);const {error}=await supabase.from("approvals").insert({title:String(f.get("title")),amount:Number(f.get("amount")),level:String(f.get("level"))});if(error)return toast.error(error.message);form.reset();qc.invalidateQueries();}}><Input name="title" placeholder="Pedido" required className="max-w-xs"/><Input name="amount" aria-label="Valor do pedido" type="number" min="0" required className="max-w-40"/><select name="level" aria-label="Instância competente" className="rounded-md border bg-background p-2 text-sm"><option value="diretor">Direção da área</option><option value="gerente">Gerente</option><option value="socios">Sócios</option></select><Button>Submeter</Button></form>{data.map(a=><div key={a.id} className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm"><span>{a.title} · <Money value={a.amount}/> · {a.level} · {a.status}</span>{a.status==="pendente"&&(me?.isSocio||(me?.isGestao&&a.level!=='socios'))&&<span className="flex gap-2">{['aprovado','rejeitado'].map(status=><Button key={status} size="sm" variant="outline" onClick={async()=>{const {error}=await supabase.rpc('decide_approval',{_id:a.id,_status:status});if(error)return toast.error(error.message);qc.invalidateQueries();}}>{status==='aprovado'?'Aprovar':'Rejeitar'}</Button>)}</span>}</div>)}</>}
