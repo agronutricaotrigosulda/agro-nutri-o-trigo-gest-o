@@ -70,7 +70,10 @@ export type Database = {
       approvals: {
         Row: {
           amount: number
+          area: string | null
           created_at: string
+          decided_at: string | null
+          decided_by: string | null
           id: string
           level: string
           requested_by: string | null
@@ -79,7 +82,10 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          area?: string | null
           created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
           level?: string
           requested_by?: string | null
@@ -88,7 +94,10 @@ export type Database = {
         }
         Update: {
           amount?: number
+          area?: string | null
           created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
           level?: string
           requested_by?: string | null
@@ -1074,6 +1083,10 @@ export type Database = {
         Args: { _absence: string; _decision: string }
         Returns: undefined
       }
+      decide_approval: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
+      }
       decide_employee_request: {
         Args: { _id: string; _status: string }
         Returns: undefined
@@ -1116,6 +1129,7 @@ export type Database = {
         Args: { _absence: string; _proof: string; _reason: string }
         Returns: undefined
       }
+      sync_project_totals: { Args: { _updates: Json }; Returns: undefined }
     }
     Enums: {
       app_role:

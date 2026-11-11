@@ -43,6 +43,13 @@
       "when": 1794291313836,
       "tag": "0005_workspace_configuration",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794368711592,
+      "tag": "0006_scoped_approval_decisions",
+      "breakpoints": true
     }
   ]
 }
