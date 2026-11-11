@@ -231,6 +231,44 @@ export type Database = {
         }
         Relationships: []
       }
+      debt_items: {
+        Row: {
+          debt_id: string
+          group_name: string | null
+          id: string
+          name: string
+          quantity: number
+          unit: string
+          unit_price: number
+        }
+        Insert: {
+          debt_id: string
+          group_name?: string | null
+          id?: string
+          name: string
+          quantity: number
+          unit?: string
+          unit_price: number
+        }
+        Update: {
+          debt_id?: string
+          group_name?: string | null
+          id?: string
+          name?: string
+          quantity?: number
+          unit?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debt_items_debt_id_fkey"
+            columns: ["debt_id"]
+            isOneToOne: false
+            referencedRelation: "debts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       debt_payments: {
         Row: {
           amount: number
@@ -661,6 +699,89 @@ export type Database = {
         }
         Relationships: []
       }
+      quota_operations: {
+        Row: {
+          actor_id: string
+          amount: number
+          buyer_id: string
+          created_at: string
+          id: string
+          quota_pct: number
+          seller_id: string | null
+        }
+        Insert: {
+          actor_id: string
+          amount: number
+          buyer_id: string
+          created_at?: string
+          id?: string
+          quota_pct: number
+          seller_id?: string | null
+        }
+        Update: {
+          actor_id?: string
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          quota_pct?: number
+          seller_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quota_operations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "shareholders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quota_operations_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "shareholders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reserve_operations: {
+        Row: {
+          actor_id: string
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          proof_path: string
+          reserve_id: string
+        }
+        Insert: {
+          actor_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          kind: string
+          proof_path: string
+          reserve_id: string
+        }
+        Update: {
+          actor_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          proof_path?: string
+          reserve_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reserve_operations_reserve_id_fkey"
+            columns: ["reserve_id"]
+            isOneToOne: false
+            referencedRelation: "strategic_reserves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resolution_votes: {
         Row: {
           created_at: string
@@ -1069,6 +1190,18 @@ export type Database = {
     }
     Functions: {
       access_level_for: { Args: { _id: string }; Returns: string }
+      add_shareholder: {
+        Args: {
+          _amount: number
+          _contact: string
+          _doc: string
+          _email: string
+          _name: string
+          _quota: number
+          _seller: string
+        }
+        Returns: string
+      }
       area_access: { Args: { _area: string; _id: string }; Returns: boolean }
       can_sell: { Args: { _user_id: string }; Returns: boolean }
       cast_resolution_vote: {
@@ -1100,6 +1233,10 @@ export type Database = {
       }
       is_gestao: { Args: { _user_id: string }; Returns: boolean }
       is_partner: { Args: { _id: string }; Returns: boolean }
+      move_reserve: {
+        Args: { _amount: number; _id: string; _kind: string; _proof: string }
+        Returns: undefined
+      }
       pay_payroll: {
         Args: {
           _amount: number
