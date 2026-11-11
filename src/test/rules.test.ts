@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { budgetAlert, distribuirLucro, deliberacao, feriasAcumuladas, folhaSalarial, faltaDentroDoPrazo, validarVenda, mesDescontoFalta, dataPagamento, bonusProjeto } from "@/lib/rules";
+import { budgetAlert, distribuirLucro, deliberacao, feriasAcumuladas, folhaSalarial, faltaDentroDoPrazo, validarVenda, mesDescontoFalta, dataPagamento, bonusProjeto, permissaoVendas } from "@/lib/rules";
 
 describe("regras", () => {
+  it("vendas apenas para funcionários autorizados e ativos",()=>{
+    expect(permissaoVendas("funcionario",true,"ativo")).toBe(true);
+    expect(permissaoVendas("funcionario",false,"ativo")).toBe(false);
+    expect(permissaoVendas("rh",true,"ativo")).toBe(false);
+    expect(permissaoVendas("funcionario",true,"suspenso")).toBe(false);
+  });
   it("alertas de orçamento", () => {
     expect(budgetAlert(100, 50)).toBe("verde");
     expect(budgetAlert(100, 81)).toBe("amarelo");

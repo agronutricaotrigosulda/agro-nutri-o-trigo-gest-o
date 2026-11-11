@@ -2,6 +2,10 @@
 
 export type BudgetAlert = "verde" | "amarelo" | "vermelho";
 
+export function permissaoVendas(level: string | undefined, enabled: boolean, status: string | undefined): boolean {
+  return status === "ativo" && (level === "socios" || level === "gerentes" || (level === "funcionario" && enabled));
+}
+
 /** Saldo restante do orçamento: > 20% verde, <= 20% amarelo, <= 10% vermelho. */
 export function budgetAlert(planned: number, spent: number): BudgetAlert {
   if (planned <= 0) return spent > 0 ? "vermelho" : "verde";
